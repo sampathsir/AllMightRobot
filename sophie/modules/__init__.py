@@ -32,7 +32,7 @@ class BaseModule:
     """Priority of the module, if Zero (0), module will reach the updates first, defaults to inf"""
 
     async def __setup__(*args: Any, **kwargs: Any) -> Any:
-        raise NotImplementedError("Setup function is not Implemented for this function!")
+        raise NotImplementedError("Setup function is not Implemented for this module!")
 
 
 def get_registered_modules() -> List:
