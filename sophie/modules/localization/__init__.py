@@ -18,10 +18,15 @@
 from typing import Any
 from aiogram import Router
 
+from sophie.modules import BaseModule
+
 router = Router()
 
 
-async def __setup__() -> Any:
-    from .handlers import __setup__ as handlers
+class LocalizationModule(BaseModule):
+    router = router
 
-    handlers()
+    async def __setup__(*args: Any, **kwargs: Any) -> Any:
+        from .handlers import __setup__ as handlers
+
+        handlers()

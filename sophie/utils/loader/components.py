@@ -20,7 +20,7 @@ import os
 from typing import Union
 
 from sophie.utils.logging import log
-from .modules import load_pkg
+from .modules import LoadPackage
 
 
 def load_component(component_name: str) -> Union[dict, bool]:
@@ -32,7 +32,9 @@ def load_component(component_name: str) -> Union[dict, bool]:
         return False
 
     log.debug(f"Loading component: {component_name}")
-    component = load_pkg(
+    loader = LoadPackage()
+
+    component = loader(
         {
             "type": "component",
             "name": component_name,

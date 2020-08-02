@@ -18,23 +18,25 @@
 from aiogram import Router
 from typing import Any
 
-from sophie.modules.owner.handlers.owners_functions import OwnersFunctions  # type: ignore
-
+from sophie.modules import BaseModule
 
 router = Router()
 
 
-async def __setup__() -> Any:
-    from .filters import __setup__ as filters
-    from .handlers import __setup__ as handlers
-    from .loader import __setup__ as loader
+class OwnerModule(BaseModule):
+    from sophie.modules.owner.handlers.owners_functions import OwnersFunctions  # type: ignore
+    router = router
 
-    filters(router)
-    handlers()
-    await loader()
+    async def __setup__(*args: Any, **kwargs: Any) -> Any:
+        from .filters import __setup__ as filters
+        from .handlers import __setup__ as handlers
+        from .loader import __setup__ as loader
+
+        filters(router)
+        handlers()
+        await loader()
 
 
 __all__ = [
-    "OwnersFunctions",
     "router"
 ]
