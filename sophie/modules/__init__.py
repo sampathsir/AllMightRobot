@@ -17,7 +17,26 @@
 
 import os
 
+from typing import Any, List, Union, Optional
+
+from aiogram import Router
 from sophie.utils.logging import log
+
+
+class BaseModule:
+
+    router: Optional[Union[List[Router], Router]]
+    """Registered router(s) for the module"""
+
+    priority: Union[int, float] = float('inf')
+    """Priority of the module, if Zero (0), module will reach the updates first, defaults to inf"""
+
+    async def __setup__(*args: Any, **kwargs: Any) -> Any:
+        raise NotImplementedError("Setup function is not Implemented for this function!")
+
+
+def get_registered_modules() -> List:
+    return BaseModule.__subclasses__()
 
 
 def list_all_modules() -> list:
