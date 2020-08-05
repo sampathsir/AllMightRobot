@@ -17,6 +17,8 @@
 # This file is part of Sophie.
 
 import asyncio
+
+from functools import wraps
 from typing import Any, TypeVar, Callable, Union, Optional, cast
 
 from sophie.utils.logging import log
@@ -25,13 +27,14 @@ from . import cache
 T = TypeVar("T", bound=Callable[..., Any])
 
 
-def cached(ttl: Union[int, float] = None, key: Optional[str] = None, noself: bool = False) -> Callable[[T], T]:
+def cached(ttl: Union[int, float] = None, key: Optional[str] = None, no_self: bool = False) -> Callable[[T], T]:
     def wrapped(func: T) -> T:
+        @wraps(func)
         async def wrapped0(*args: Any, **kwargs: Any) -> Any:
             ordered_kwargs = sorted(kwargs.items())
 
             new_key = key if key else (func.__module__ or "") + func.__name__
-            new_key += str(args[1:] if noself else args)
+            new_key += str(args[1:] if no_self else args)
 
             if ordered_kwargs:
                 new_key += str(ordered_kwargs)
