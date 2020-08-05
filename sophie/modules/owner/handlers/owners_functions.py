@@ -40,7 +40,7 @@ class OwnersFunctions:
         }, title='Stats')
 
         for module in LOADED_MODULES.values():
-            if getattr(module['object'], '__stats__', None):
+            if hasattr(module['object'], '__stats__'):
                 text_list = module['object'].__stats__(text_list)
 
         await self.reply(text_list.text)
@@ -63,7 +63,7 @@ class OwnersFunctions:
 
     async def term(self, arg_raw: Optional[str] = None) -> Any:
         cmd = arg_raw
-        text_list = FormatListText({'$': '\n' + arg_raw}, title='Shell')
+        text_list = FormatListText({'$': '\n' + cmd}, title='Shell')
         stdout, stderr = await term(cmd)
         text_list['stdout'] = '\n' + stdout
         text_list['stderr'] = '\n' + stderr

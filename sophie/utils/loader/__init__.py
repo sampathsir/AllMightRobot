@@ -25,4 +25,9 @@ from .modules import load_all_modules
 LOADED_MODULES: Dict[str, dict] = {}
 LOADED_COMPONENTS: Dict[str, dict] = {}
 
-__all__ = ["post_init", "load_all_modules"]
+__all__ = [
+    "LOADED_MODULES",
+    "LOADED_COMPONENTS",
+    "post_init",
+    "load_all_modules"
+]

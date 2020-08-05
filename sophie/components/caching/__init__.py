@@ -16,26 +16,7 @@
 #
 # This file is part of Sophie.
 
-import asyncio
+from .caching import __setup__ as caching
 
-from aiocache import Cache
+cache = caching()
 
-from sophie.utils.config import config
-from sophie.utils.logging import log
-from .mode import mode_kwargs, mode
-from .serializer import serializer
-
-namespace = config.cache.namespace
-
-cache = Cache(
-    cache_class=mode,
-    namespace=namespace,
-    serializer=serializer(),
-    **mode_kwargs
-)
-
-try:
-    asyncio.ensure_future(cache.set('foo', 'bar'))
-except ConnectionRefusedError:
-    log.critical("Can't connect to the cache database! Exiting...")
-    exit(2)
