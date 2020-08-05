@@ -27,7 +27,7 @@ async def __setup__() -> Any:
     log.debug('Loading owners functions...')
 
     for module in LOADED_MODULES.values():
-        if getattr(module['object'], 'OwnersFunctions', None):
+        if hasattr(module['object'], 'OwnersFunctions'):
             log.debug(f"Found owners function for {module['name']} module")
             class_object = module['object'].OwnersFunctions
 
