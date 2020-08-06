@@ -15,7 +15,7 @@
 #
 # This file is part of Sophie.
 
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from aiogram.dispatcher.handler import MessageHandler
 

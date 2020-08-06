@@ -22,7 +22,6 @@ import typing
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from motor_odm import Document
-
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 
@@ -32,7 +31,6 @@ from sophie.utils.logging import log
 if typing.TYPE_CHECKING:
     from motor.core import AgnosticDatabase
     from pymongo.database import Database
-
 
 MONGO_URI = config.mongo.url
 MONGO_DB = config.mongo.namespace

@@ -16,15 +16,14 @@
 # This file is part of Sophie.
 
 import os
-
 from typing import Any, List, Union, Optional
 
 from aiogram import Router
+
 from sophie.utils.logging import log
 
 
 class BaseModule:
-
     router: Optional[Union[List[Router], Router]]
     """Registered router(s) for the module"""
 

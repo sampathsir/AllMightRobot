@@ -15,11 +15,12 @@
 #
 # This file is part of Sophie.
 
-from aiogram import Router
 from typing import Any
 
-from .user_status import __setup__ as user_status
+from aiogram import Router
+
 from .op_cmd import __setup__ as op_cmd
+from .user_status import __setup__ as user_status
 
 
 def __setup__(dp: Router) -> Any:

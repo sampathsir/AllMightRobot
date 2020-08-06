@@ -17,8 +17,8 @@
 # This file is part of Sophie.
 
 import asyncio
-
 from typing import Any, Tuple
+
 from aiocache import Cache
 
 from sophie.utils.config import config

@@ -16,9 +16,10 @@
 #
 # This file is part of Sophie.
 
+from typing import TextIO
+
 import pkg_resources
 
-from typing import TextIO
 from sophie.utils.logging import log
 
 

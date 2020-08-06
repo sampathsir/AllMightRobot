@@ -15,13 +15,13 @@
 #
 # This file is part of Sophie.
 
-from babel.core import Locale
 from typing import Union, TypeVar, Any, Dict, cast, Callable
 
 from aiogram.dispatcher.handler import MessageHandler
+from babel.core import Locale
 
-from .locale import get_chat_locale
 from .lanuages import get_babel, get_language_emoji
+from .locale import get_chat_locale
 
 
 class GetStrings:
@@ -100,4 +100,5 @@ def get_strings_dec(func: T) -> T:
         strings = Strings(await get_chat_locale(chat_id), module_name)
 
         return await func(event, *args, strings=strings, **kwargs)
+
     return cast(T, decorated)

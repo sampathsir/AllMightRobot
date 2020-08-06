@@ -17,8 +17,9 @@
 
 import typing
 
-from pymongo import IndexModel, ASCENDING, ReturnDocument
 from pydantic import constr
+from pymongo import IndexModel, ASCENDING, ReturnDocument
+
 from sophie.services.mongo import sync_mongo, Document
 from sophie.utils.logging import log
 

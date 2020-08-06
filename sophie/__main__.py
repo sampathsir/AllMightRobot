@@ -19,11 +19,10 @@ import asyncio
 from importlib import import_module
 from logging import DEBUG
 
-from sophie.utils.config import config
-
 from sophie.modules.utils.filters import __setup__ as filters_setup
 from sophie.modules.utils.middlewares import __setup__ as middlewares_setup
 from sophie.services.aiogram import dp, bot
+from sophie.utils.config import config
 from sophie.utils.loader import load_all_modules, post_init
 from sophie.utils.logging import log
 from sophie.utils.migrator.migrator import __setup__ as migrator
