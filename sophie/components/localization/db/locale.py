@@ -15,64 +15,52 @@
 #
 # This file is part of Sophie.
 
-from pymongo import ASCENDING
-from typing import Optional, Any
+from __future__ import annotations
 
-from sophie.services.mongo import mongo, sync_mongo
+import typing
+
+from pymongo import IndexModel, ASCENDING, ReturnDocument
+from pydantic import constr
+from sophie.services.mongo import sync_mongo, Document
 from sophie.utils.logging import log
 
 col_name = 'locale'
-col_validation = {
-    "$jsonSchema":
-        {
-            "bsonType": "object",
-            "required": ["chat_id", "locale_code"],
-            "properties": {
-                "chat_id": {
-                    "bsonType": "long"
-                },
-                "locale_code": {
-                    "bsonType": "string",
-                    "pattern": "^[a-z]{2}-[A-Z]{2}$"
-                }
-            }
-        }
-}
+
+if typing.TYPE_CHECKING:
+    LocaleCode = str
+else:
+    LocaleCode = constr(regex="^[a-z]{2}-[A-Z]{2}$")
 
 
-async def set_lang(chat_id: int, locale_code: str) -> dict:
-    data = {
+class LocalizationDB(Document):
+    chat_id: int
+    locale_code: LocaleCode
+
+    class Mongo:
+        collection = col_name
+        indexes = [IndexModel([("chat_id", ASCENDING)], name="chat_id", unique=True)]
+
+
+async def set_lang(chat_id: int, locale_code: str) -> typing.Optional[LocalizationDB]:
+    payload = {
         'chat_id': chat_id,
         'locale_code': locale_code
     }
-
-    await mongo[col_name].replace_one({'chat_id': chat_id}, data, upsert=True)
-
+    data = await LocalizationDB.find_one_and_replace(
+        {"chat_id": chat_id}, payload, return_document=ReturnDocument.AFTER, upsert=True
+    )
     return data
 
 
-async def get_lang(chat_id: int) -> Optional[str]:
-    data = await mongo[col_name].find_one({'chat_id': chat_id})
-    if not data:
-        return None
-
-    return data['locale_code']
+async def get_lang(chat_id: int) -> typing.Optional[LocalizationDB]:
+    data = await LocalizationDB.find_one({"chat_id": chat_id})
+    return data
 
 
-def __setup__() -> Any:
+async def __setup__() -> typing.Any:
     if col_name not in sync_mongo.list_collection_names():
         log.info(f'Created not exited column "{col_name}"')
         sync_mongo.create_collection(col_name)
 
-    log.debug(f'Running validation cmd for "{col_name}" column')
-    sync_mongo.command({
-        'collMod': col_name,
-        'validator': col_validation,
-        'validationLevel': 'strict'
-    })
     log.debug(f'Creating indexes for "{col_name}" column')
-    sync_mongo[col_name].create_index(
-        [('chat_id', ASCENDING)],
-        name='chat_id',
-        unique=True,
-    )
+    await LocalizationDB.init_indexes()

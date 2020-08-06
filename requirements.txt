@@ -25,6 +25,9 @@ git+https://github.com/aiogram/aiogram@dev-3.x
 pymongo
 motor
 aiocache
+git+https://github.com/codello/Motor-ODM.git
+
+pydantic
 
 # Optional deps to make bot faster
 aiohttp[speedups]
