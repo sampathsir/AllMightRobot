@@ -16,17 +16,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from motor.core import AgnosticDatabase
+import typing
+
 from motor.motor_asyncio import AsyncIOMotorClient
+from motor_odm import Document
 
 from pymongo import MongoClient
-from pymongo.database import Database
 from pymongo.errors import ServerSelectionTimeoutError
-
-from motor_odm import Document
 
 from sophie.utils.config import config
 from sophie.utils.logging import log
+
+if typing.TYPE_CHECKING:
+    from motor.core import AgnosticDatabase
+    from pymongo.database import Database
+
 
 MONGO_URI = config.mongo.url
 MONGO_DB = config.mongo.namespace

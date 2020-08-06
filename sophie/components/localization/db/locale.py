@@ -15,8 +15,6 @@
 #
 # This file is part of Sophie.
 
-from __future__ import annotations
-
 import typing
 
 from pymongo import IndexModel, ASCENDING, ReturnDocument

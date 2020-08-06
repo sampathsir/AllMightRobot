@@ -15,13 +15,14 @@
 #
 # This file is part of Sophie.
 
-from __future__ import annotations
-
 import typing
 
 from sophie.components.caching.cached import cached
 from sophie.utils.config import config
-from .db.locale import get_lang, set_lang, LocalizationDB
+from .db.locale import get_lang, set_lang
+
+if typing.TYPE_CHECKING:
+    from .db.locale import LocalizationDB
 
 
 @cached()
