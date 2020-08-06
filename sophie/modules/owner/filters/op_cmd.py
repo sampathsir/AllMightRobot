@@ -16,7 +16,6 @@
 # This file is part of Sophie.
 
 import re
-
 from typing import Any, Dict, Union
 
 from aiogram import Router

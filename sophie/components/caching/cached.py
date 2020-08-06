@@ -17,7 +17,6 @@
 # This file is part of Sophie.
 
 import asyncio
-
 from functools import wraps
 from typing import Any, TypeVar, Callable, Union, Optional, cast
 
@@ -49,4 +48,5 @@ def cached(ttl: Union[int, float] = None, key: Optional[str] = None, no_self: bo
             return result
 
         return cast(T, wrapped0)
+
     return cast(Callable[[T], T], wrapped)

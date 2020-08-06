@@ -18,10 +18,11 @@
 # type: ignore  # mess
 
 from typing import Any, Optional
+
 from aiogram import Router
 
-from sophie.modules.utils.text import FormatListText
 from sophie.modules.utils.term import term
+from sophie.modules.utils.text import FormatListText
 
 
 class OwnersFunctions:

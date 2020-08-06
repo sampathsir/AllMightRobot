@@ -18,16 +18,18 @@
 #
 
 import logging as log
+
 from pydantic import BaseSettings, ValidationError
 
 # configs
-from sophie.components.__config__ import (CacheConfig, PyrogramConfig,  # type: ignore
-                                          LocalizationConfig, component_config)  # type: ignore
+from sophie.components.__config__ import (
+    CacheConfig, PyrogramConfig,  # type: ignore
+    LocalizationConfig, component_config
+)  # type: ignore
 from .general import GeneralConfig, AdvancedConfig, ModuleConfig, MongoConfig, general_config  # type: ignore
 
 
 class Conf(BaseSettings):
-
     # Some fields are required, some can follow default value
     general: GeneralConfig = GeneralConfig()
     advanced: AdvancedConfig = AdvancedConfig()

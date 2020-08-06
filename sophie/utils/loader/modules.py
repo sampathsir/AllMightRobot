@@ -16,17 +16,16 @@
 #
 # This file is part of Sophie.
 
-import os
 import inspect
-
+import os
 from importlib import import_module
 from types import ModuleType
 from typing import List, Dict, Union, Any
 
 from aiogram import Router
-from sophie.utils.logging import log
-from sophie.utils.config import config
 
+from sophie.utils.config import config
+from sophie.utils.logging import log
 from .requirements import check_requirements
 
 

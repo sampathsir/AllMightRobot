@@ -16,11 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Optional, Any
+
 from pymongo import ASCENDING
 
 from sophie.services.mongo import sync_mongo
 from sophie.utils.logging import log
-
 
 col_name = 'migrator'
 col_validation = {

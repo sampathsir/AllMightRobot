@@ -21,10 +21,10 @@
 # type: ignore
 
 import os
-import toml
-
-from pydantic import BaseModel
 from typing import List, MutableMapping
+
+import toml
+from pydantic import BaseModel
 
 from .field import Field
 

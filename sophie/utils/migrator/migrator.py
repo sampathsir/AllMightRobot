@@ -16,17 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
-
-from typing import Any, Optional
 from importlib import import_module
+from typing import Any, Optional
 
-from sophie.utils.logging import log
-from sophie.utils.loader import LOADED_MODULES, LOADED_COMPONENTS
 from sophie.utils.config import config
-
-from .db import __setup__ as setup_db
-from .db import get_current_version, set_version
-
+from sophie.utils.loader import LOADED_MODULES, LOADED_COMPONENTS
+from sophie.utils.logging import log
+from .db import __setup__ as setup_db, get_current_version, set_version
 
 typed_loaded = {
     'module': LOADED_MODULES,
@@ -90,7 +86,7 @@ def migrate(loaded: dict, latest_version: Optional[int]) -> Any:
         return
 
     while current_version := get_current_version(loaded['name'], loaded['type']) < \
-            typed_loaded[loaded['type']][loaded['name']]['latest_db_version']:
+                             typed_loaded[loaded['type']][loaded['name']]['latest_db_version']:
         new_version = current_version + 1
         log.debug(f"Migrating {loaded['name']} {loaded['type']} to {new_version} version...")
 

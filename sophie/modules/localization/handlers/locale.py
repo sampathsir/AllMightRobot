@@ -19,10 +19,8 @@ from typing import Any
 
 from aiogram.dispatcher.handler import MessageHandler
 
-from sophie.components.localization.strings import get_strings_dec
 from sophie.components.localization.lanuages import get_language_name
-
-from sophie.modules.utils.text import FormatListText
+from sophie.components.localization.strings import get_strings_dec
 from .. import router
 
 

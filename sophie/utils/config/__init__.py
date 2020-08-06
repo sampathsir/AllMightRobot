@@ -17,7 +17,7 @@
 # This file is part of Sophie.
 #
 
-from .field import Field
 from .config import config
+from .field import Field
 
 __all__ = ["Field", "config"]

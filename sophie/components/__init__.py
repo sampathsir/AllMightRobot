@@ -15,6 +15,7 @@
 #
 # This file is part of Sophie.
 
+import logging as log
 import os
 import logging as log
 

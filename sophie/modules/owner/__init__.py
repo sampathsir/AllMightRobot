@@ -15,8 +15,9 @@
 #
 # This file is part of Sophie.
 
-from aiogram import Router
 from typing import Any
+
+from aiogram import Router
 
 from sophie.modules import BaseModule
 

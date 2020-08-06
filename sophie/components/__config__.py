@@ -20,12 +20,12 @@
 # type: ignore
 
 import os
-import toml
-
 from typing import Optional, List
 
-from sophie.utils.config import Field
+import toml
 from pydantic.main import BaseModel
+
+from sophie.utils.config import Field
 
 
 class CacheConfig(BaseModel):  # settings for component 'Caching'
