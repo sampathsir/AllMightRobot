@@ -15,6 +15,8 @@
 #
 # This file is part of Sophie.
 
+from __future__ import annotations
+
 import typing
 
 from sophie.components.caching.cached import cached
