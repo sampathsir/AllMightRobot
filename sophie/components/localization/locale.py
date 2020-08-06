@@ -15,9 +15,13 @@
 #
 # This file is part of Sophie.
 
+from __future__ import annotations
+
+import typing
+
 from sophie.components.caching.cached import cached
 from sophie.utils.config import config
-from .db.locale import get_lang, set_lang
+from .db.locale import get_lang, set_lang, LocalizationDB
 
 
 @cached()
@@ -26,8 +30,8 @@ async def get_chat_locale(chat_id: int) -> str:
     if not lang:
         return config.localization.default_language
 
-    return lang
+    return lang.locale_code
 
 
-async def set_chat_locale(chat_id: int, locale_code: str) -> dict:
+async def set_chat_locale(chat_id: int, locale_code: str) -> typing.Optional[LocalizationDB]:
     return await set_lang(chat_id, locale_code)
