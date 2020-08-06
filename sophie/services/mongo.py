@@ -16,11 +16,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from motor.core import AgnosticDatabase
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.errors import ServerSelectionTimeoutError
+
+from motor_odm import Document
 
 from sophie.utils.config import config
 from sophie.utils.logging import log
@@ -34,10 +37,14 @@ sync_mongo: Database = mongo_client[MONGO_DB]
 
 # Async mongo
 motor = AsyncIOMotorClient(MONGO_URI)
-mongo: Database = motor[MONGO_DB]
+mongo: AgnosticDatabase = motor[MONGO_DB]
+
+Document.use(mongo)
 
 try:
     mongo_client.server_info()
 except ServerSelectionTimeoutError:
     log.critical("Can't connect to the MongoDB! Exiting...")
     exit(2)
+
+__all__ = ["sync_mongo", "mongo", "Document"]
