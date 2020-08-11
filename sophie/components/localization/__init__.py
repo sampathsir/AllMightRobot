@@ -27,7 +27,7 @@ async def __setup__() -> bool:
     log.debug('...Done!')
 
     log.debug('Loading database...')
-    database()
+    await database()
     log.debug('...Done!')
 
     return True

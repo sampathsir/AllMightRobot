@@ -18,7 +18,7 @@
 from typing import Any
 
 
-def __setup__() -> Any:
+async def __setup__() -> Any:
     from .locale import __setup__ as locale
 
-    locale()
+    await locale()

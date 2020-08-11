@@ -15,10 +15,9 @@
 #
 # This file is part of Sophie.
 
-from typing import Any
+import typing
 
 from aiogram import Router
-
 from sophie.modules import BaseModule
 
 router = Router()
@@ -27,7 +26,7 @@ router = Router()
 class LocalizationModule(BaseModule):
     router = router
 
-    async def __setup__(*args: Any, **kwargs: Any) -> Any:
+    async def __setup__(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
         from .handlers import __setup__ as handlers
 
         handlers()
