@@ -30,15 +30,15 @@ typed_loaded = {
 }
 
 
-def __setup__() -> Any:
-    setup_db()
+async def __setup__() -> Any:
+    await setup_db()
 
     for loaded in [*LOADED_MODULES.values(), *LOADED_COMPONENTS.values()]:
         log.debug(f"Running migration check for {loaded['name']} {loaded['type']}...")
         latest_version = set_latest_version(loaded)
         if latest_version:
-            migrate(loaded, latest_version)
-        set_current_version(loaded)
+            await migrate(loaded, latest_version)
+        await set_current_version(loaded)
 
 
 def set_latest_version(loaded: dict) -> Optional[int]:
@@ -60,15 +60,16 @@ def set_latest_version(loaded: dict) -> Optional[int]:
     return latest_version
 
 
-def set_current_version(loaded: dict) -> Optional[str]:
-    current_version = get_current_version(loaded['name'], loaded['type'])
+async def set_current_version(loaded: dict) -> Optional[int]:
+    current_version = await get_current_version(loaded['name'], loaded['type'])
     typed_loaded[loaded['type']][loaded['name']]['current_db_version'] = current_version
     return current_version
 
 
-def migrate(loaded: dict, latest_version: Optional[int]) -> Any:
+async def migrate(loaded: dict, latest_version: int) -> Any:
+    current_version = await get_current_version(loaded['name'], loaded['type'])
     # Check if loaded was never migrated before
-    if get_current_version(loaded['name'], loaded['type']) is None:
+    if current_version is None:
         log.info(f"Database version is not set for {loaded['name']} {loaded['type']}, setting it...")
         if os.path.exists(loaded['path'] + '/migrate/new.py'):
             log.debug(f"Running new.py for {loaded['name']} {loaded['type']}...")
@@ -77,7 +78,7 @@ def migrate(loaded: dict, latest_version: Optional[int]) -> Any:
         else:
             log.debug(f"new.py not found for {loaded['name']} {loaded['type']}, skipping.")
 
-        set_version(loaded['name'], loaded['type'], loaded['latest_db_version'])
+        await set_version(loaded['name'], loaded['type'], loaded['latest_db_version'])
         log.info('...Done')
         return
 
@@ -85,8 +86,7 @@ def migrate(loaded: dict, latest_version: Optional[int]) -> Any:
         log.warning('Migrator is disabled, skipping...')
         return
 
-    while current_version := get_current_version(loaded['name'], loaded['type']) < \
-                             typed_loaded[loaded['type']][loaded['name']]['latest_db_version']:
+    while current_version < latest_version:
         new_version = current_version + 1
         log.debug(f"Migrating {loaded['name']} {loaded['type']} to {new_version} version...")
 
@@ -95,4 +95,4 @@ def migrate(loaded: dict, latest_version: Optional[int]) -> Any:
         import_module(package)
         log.debug('...Done')
 
-        set_version(loaded['name'], loaded['type'], new_version)
+        await set_version(loaded['name'], loaded['type'], new_version)
