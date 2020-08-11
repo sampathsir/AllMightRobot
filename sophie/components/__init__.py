@@ -17,7 +17,6 @@
 
 import logging as log
 import os
-import logging as log
 
 
 def list_all_components() -> list:
