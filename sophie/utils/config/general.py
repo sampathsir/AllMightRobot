@@ -18,8 +18,6 @@
 #
 # Contains general/Core config model
 
-# type: ignore
-
 import os
 from typing import List, MutableMapping
 

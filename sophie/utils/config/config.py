@@ -23,10 +23,9 @@ from pydantic import BaseSettings, ValidationError
 
 # configs
 from sophie.components.__config__ import (
-    CacheConfig, PyrogramConfig,  # type: ignore
-    LocalizationConfig, component_config
-)  # type: ignore
-from .general import GeneralConfig, AdvancedConfig, ModuleConfig, MongoConfig, general_config  # type: ignore
+    CacheConfig, PyrogramConfig, LocalizationConfig, component_config
+)
+from .general import GeneralConfig, AdvancedConfig, ModuleConfig, MongoConfig, general_config
 
 
 class Conf(BaseSettings):
@@ -42,7 +41,7 @@ class Conf(BaseSettings):
 
 payload = {**general_config, **component_config}
 try:
-    config: Conf = Conf(**payload)
+    config: Conf = Conf(**payload)  # type: ignore
 except ValidationError as error:
     log.error(f'Something went wrong when loading config \n {str(error)}')
     exit(5)

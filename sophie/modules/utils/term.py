@@ -17,16 +17,18 @@
 
 import asyncio
 import html
+import typing
 
 
-async def term(command):
+async def term(command: str) -> typing.Tuple[str, str]:
+
     process = await asyncio.create_subprocess_shell(
         command,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await process.communicate()
-    stdout = html.escape(str(stdout.decode().strip()))
-    stderr = html.escape(str(stderr.decode().strip()))
+    out = html.escape(str(stdout.decode().strip()))
+    err = html.escape(str(stderr.decode().strip()))
 
-    return stdout, stderr
+    return out, err

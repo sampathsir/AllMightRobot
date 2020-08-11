@@ -17,8 +17,6 @@
 # This file is part of Sophie.
 # Includes config structure
 
-# type: ignore
-
 import os
 from typing import Optional, List
 
@@ -69,4 +67,4 @@ def __conf__() -> dict:
     return payload
 
 
-component_config = __conf__()
+component_config: dict = __conf__()

@@ -25,7 +25,7 @@ router = Router()
 
 
 class OwnerModule(BaseModule):
-    from sophie.modules.owner.handlers.owners_functions import OwnersFunctions  # type: ignore
+    from sophie.modules.owner.handlers.owners_functions import OwnersFunctions
     router = router
 
     async def __setup__(*args: Any, **kwargs: Any) -> Any:

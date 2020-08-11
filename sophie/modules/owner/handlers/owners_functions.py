@@ -15,14 +15,16 @@
 #
 # This file is part of Sophie.
 
-# type: ignore  # mess
+from __future__ import annotations
 
-from typing import Any, Optional
-
-from aiogram import Router
+import typing
 
 from sophie.modules.utils.term import term
 from sophie.modules.utils.text import FormatListText
+
+if typing.TYPE_CHECKING:
+    from aiogram import Router
+    from aiogram.api.types import Message
 
 
 class OwnersFunctions:
@@ -30,7 +32,8 @@ class OwnersFunctions:
         # self.echo.only_owner = True
         pass
 
-    async def stats(self) -> Any:
+    @staticmethod
+    async def stats(message: Message) -> typing.Any:
         from sophie.version import version
         from sophie.utils.loader import LOADED_MODULES
 
@@ -44,9 +47,10 @@ class OwnersFunctions:
             if hasattr(module['object'], '__stats__'):
                 text_list = module['object'].__stats__(text_list)
 
-        await self.reply(text_list.text)
+        await message.reply(text_list.text)
 
-    async def modules(self) -> Any:
+    @staticmethod
+    async def modules(message: Message) -> typing.Any:
         from sophie.utils.loader import LOADED_MODULES
 
         data = []
@@ -60,12 +64,14 @@ class OwnersFunctions:
             data.append((module['name'], args))
 
         # Convert list to tuple, to make FormatListText understand this as typed list
-        await self.reply(FormatListText(tuple(data), title='Loaded modules').text)
+        await message.reply(FormatListText(tuple(data), title='Loaded modules').text)
 
-    async def term(self, arg_raw: Optional[str] = None) -> Any:
+    @staticmethod
+    async def term(message: Message, arg_raw: typing.Optional[str] = None) -> typing.Any:
         cmd = arg_raw
-        text_list = FormatListText({'$': '\n' + cmd}, title='Shell')
-        stdout, stderr = await term(cmd)
-        text_list['stdout'] = '\n' + stdout
-        text_list['stderr'] = '\n' + stderr
-        await self.reply(text_list.text)
+        if cmd is not None:
+            text_list = FormatListText({'$': '\n' + cmd}, title='Shell')
+            stdout, stderr = await term(cmd)
+            text_list['stdout'] = '\n' + stdout
+            text_list['stderr'] = '\n' + stderr
+            await message.reply(text_list.text)
