@@ -39,7 +39,7 @@ class Types(str, enum.Enum):
 
 class MigrationDB(Document):
     name: str
-    type: Types
+    type: Types  # noqa: A003
     version: int
 
     class Mongo:
