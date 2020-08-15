@@ -99,7 +99,7 @@ async def _parse(
                     args.append(parsed_text[field_info.index])
 
                 if parser.last_fields:
-                    args.append(values.get(list(values.keys())[-1]))  # get last field value n pass it
+                    args.append(values)
 
                 if parser.communicate:
                     args.append(transporter)

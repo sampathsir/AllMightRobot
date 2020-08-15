@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import functools
 import typing
 
 from .parser import _parse
@@ -52,17 +51,18 @@ def parse_method(
             # communication param contains "{"I got field1": 1}
             return text
 
-    You can also view the value of last field::
+    You can also view the value of last fields::
 
         @parse_method("field4", last_fields=True, communication=True)
         def field4_parse_method(cls, message, text, last_fields, comm):
+            # last_fields :> {"field1": ..., "field2": ...}
             return text
 
 
     :param fields:  fields which parser made for
-    :param last_fields: If parser need the last field value
-    :param pass_whole_text:  If parser needs whole text instead of Index matched field
-    :param communicate:  if parser need to recieve communication data from the ``last`` field parser
+    :param last_fields: If True, parser will get all parsed fields (yet)
+    :param pass_whole_text: whole text instead of Index matched field
+    :param communicate:  if parser need to recieve additional data from last field
     """
 
     def decorator(func: typing.Callable[..., typing.Any]) -> classmethod:
@@ -123,7 +123,6 @@ def parse_arguments(
             func: typing.Callable[..., typing.Any]
     ) -> typing.Callable[..., typing.Any]:
 
-        @functools.wraps(func)
         async def wrapped(event: Message, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
             cls = parser
             if cls is None:
