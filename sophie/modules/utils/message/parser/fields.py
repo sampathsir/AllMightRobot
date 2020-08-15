@@ -30,15 +30,15 @@ class Undefined:
 
 
 class IndexField(typing.Generic[T]):
-    slice: slice
+    index: slice
 
     def __class_getitem__(cls, index: typing.Any) -> typing.Any:
-        cls.slice = index
-        return cls.slice
+        cls.index = index
+        return cls.index
 
     def __getitem__(self, index: typing.Any) -> typing.Any:  # python3.8
-        self.slice = index
-        return self.slice
+        self.index = index
+        return self.index
 
 
 def ArgField(

@@ -123,5 +123,5 @@ async def _parse(
                 values[field] = parsed_text[field_info.index]
 
     instance = cls()
-    setattr(instance, "__dict__", values)
+    setattr(instance, "__dict__", values)  # noqa
     return instance

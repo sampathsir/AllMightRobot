@@ -37,7 +37,6 @@ class _ArgField:
         self.default = default
         self.index = index
         self.allow_none = allow_none
-        print(description)
         self.description = description
 
 

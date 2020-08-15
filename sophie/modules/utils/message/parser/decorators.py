@@ -67,7 +67,7 @@ def parse_method(
 
     def decorator(func: typing.Callable[..., typing.Any]) -> classmethod:
         f_cls = func if isinstance(func, classmethod) else classmethod(func)
-        setattr(
+        setattr(  # noqa
             f_cls,
             "__parser_method__",
             (
