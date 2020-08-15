@@ -47,7 +47,7 @@ log.info('Modules loaded successfully!')
 
 if config.advanced.migrator:
     log.info("Checking database migration status...")
-    migrator()
+    migrator(loop)
     log.info('...Done!')
 
 log.debug('Loading middlewares...')

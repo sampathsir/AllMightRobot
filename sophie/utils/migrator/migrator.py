@@ -15,14 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os.path
+from __future__ import annotations
+
+import os
+
 from importlib import import_module
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 from sophie.utils.config import config
 from sophie.utils.loader import LOADED_MODULES, LOADED_COMPONENTS
 from sophie.utils.logging import log
 from .db import __setup__ as setup_db, get_current_version, set_version
+
+if TYPE_CHECKING:
+    from asyncio.events import AbstractEventLoop
 
 typed_loaded = {
     'module': LOADED_MODULES,
@@ -30,9 +36,12 @@ typed_loaded = {
 }
 
 
-async def __setup__() -> Any:
-    await setup_db()
+def __setup__(loop: AbstractEventLoop) -> Any:
+    loop.run_until_complete(setup_db())
+    loop.run_until_complete(migrate_check())
 
+
+async def migrate_check() -> Any:
     for loaded in [*LOADED_MODULES.values(), *LOADED_COMPONENTS.values()]:
         log.debug(f"Running migration check for {loaded['name']} {loaded['type']}...")
         latest_version = set_latest_version(loaded)
