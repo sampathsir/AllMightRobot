@@ -104,7 +104,7 @@ async def _parse(
                 if parser.communicate:
                     args.append(transporter)
 
-                if inspect.iscoroutine(parser.parser):
+                if inspect.iscoroutinefunction(parser.parser):
                     parsed = await parser.parser(cls, *args)
                 else:
                     parsed = parser.parser(cls, *args)
