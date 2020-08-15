@@ -18,6 +18,7 @@
 
 from .parser import ArgumentParser, ArgField, IndexField, parse_method, parse_arguments
 from .message import get_args, get_args_list
+from .handlers import MessageHandler, CallbackQueryHandler
 
 __all__ = [
     "ArgumentParser",
@@ -26,5 +27,7 @@ __all__ = [
     "parse_method",
     "parse_arguments",
     "get_args",
-    "get_args_list"
+    "get_args_list",
+    "MessageHandler",
+    "CallbackQueryHandler"
 ]

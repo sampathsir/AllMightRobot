@@ -17,10 +17,10 @@
 
 from typing import Any
 
-from aiogram.dispatcher.handler import MessageHandler
-
 from sophie.components.localization.lanuages import get_language_name
 from sophie.components.localization.strings import get_strings_dec
+from sophie.modules.utils.message import MessageHandler
+
 from .. import router
 
 
@@ -28,7 +28,6 @@ from .. import router
 @get_strings_dec
 class GetLanguageMenu(MessageHandler):
     async def handle(self) -> Any:
-        strings = self.data['strings']
 
-        text = strings.get('current_lang', emoji=strings.emoji, language=get_language_name(strings.code))
+        text = self.strings.get('current_lang', emoji=self.strings.emoji, language=get_language_name(self.strings.code))
         await self.event.reply(text)

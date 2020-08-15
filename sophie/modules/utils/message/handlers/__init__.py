@@ -1,4 +1,5 @@
 # Copyright (C) 2018 - 2020 MrYacha.
+# Copyright (C) 2020 Jeepeo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,25 +16,7 @@
 #
 # This file is part of Sophie.
 
-from __future__ import annotations
+from .message import MessageHandler
+from .callback_query import CallbackQueryHandler
 
-import typing
-
-if typing.TYPE_CHECKING:
-    from aiogram.api.types import Message
-
-
-def get_args(message: Message) -> str:
-    if message.text is not None:
-        args = message.text.split(' ', 1)  # TODO: Change to aio's method
-        if len(args) == 1:
-            return ''
-        return args[1]
-    return ''
-
-
-def get_args_list(message: Message, lower: bool = True) -> typing.List[str]:
-    args = get_args(message)
-    if lower:
-        args = args.lower()
-    return args.split(' ')
+__all__ = ["MessageHandler", "CallbackQueryHandler"]
