@@ -22,7 +22,7 @@ import os
 from typing import List, MutableMapping
 
 import toml
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from .field import Field
 
@@ -31,6 +31,11 @@ class GeneralConfig(BaseModel):
     token: str = Field(None, env="TOKEN")
     owner_id: int = Field(None, env="OWNER_ID")
     operators: List[int] = Field([], env="OPERATORS")
+
+    @validator("operators")
+    def populate_operators(cls, operators: List[int], values: dict) -> List[int]:
+        operators.append(values["owner_id"])
+        return operators
 
 
 class AdvancedConfig(BaseModel):  # Advanced settings
