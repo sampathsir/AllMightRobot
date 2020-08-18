@@ -19,12 +19,15 @@
 from __future__ import annotations
 
 import typing
-from abc import ABCMeta
+import inspect
+
+from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 
 from ._internal import _ArgField
 
 if typing.TYPE_CHECKING:
+    from aiogram.api.types import Message
     from ._internal import _Parser
 
 
@@ -35,6 +38,7 @@ class ArgumentParserMeta(ABCMeta):
     ) -> typing.Any:
         fields = {}
         parsers = {}
+        root_parser = None
 
         # check in base class; if there is predefined
         # argument parsing methods or field declared in there
@@ -43,11 +47,16 @@ class ArgumentParserMeta(ABCMeta):
             if hasattr(base, "__ArgumentParser__") or base.__name__ != "ArgumentParser":
                 fields.update(deepcopy(base.__fields__))
                 parsers.update(deepcopy(base.__parsers__))
+                root_parser = base.__root_parser__
 
         for field in namespace:
             field_info = namespace.get(field)
             if not isinstance(field_info, _ArgField):
                 mcs._extract_parsers_(parsers, field_info)
+
+                if field_info is not None and inspect.isclass(field_info):
+                    if issubclass(field_info, BaseRootParser):
+                        root_parser = field_info
                 continue
 
             # we allow fields to overide the fields declared in base
@@ -57,6 +66,7 @@ class ArgumentParserMeta(ABCMeta):
         new_namespace = {
             "__fields__": fields,
             "__parsers__": parsers,
+            "__root_parser__": root_parser,
             "__ArgumentParser__": True,
             **{name: value for name, value in namespace.items() if name not in (fields or parsers)},
         }
@@ -73,11 +83,32 @@ class ArgumentParserMeta(ABCMeta):
                     parsers[field] = attr[1]
 
 
+class BaseRootParser(metaclass=ABCMeta):
+    """
+    Root parsers are used to process the text in a custom way.
+
+    All you need to do is return the ``list of anything`` (in function `get_text`)
+    that is processed, should fit the index defined by fields
+    """
+
+    @abstractmethod
+    async def get_text(
+            self, message: Message, text: typing.Optional[str], fields: dict
+    ) -> list:
+        """
+        :param message: Message object
+        :param text: return the whole text deducting the ``/command``
+        :param fields: fields defined in the class
+        """
+        raise NotImplementedError
+
+
 class ArgumentParser(metaclass=ArgumentParserMeta):
 
     if typing.TYPE_CHECKING:
         __fields__: typing.Dict[typing.Any, _ArgField]
         __parsers__: typing.Dict[str, _Parser]
+        __root_parser__: typing.Optional[typing.Type[BaseRootParser]]
 
     __splitter__ = " "
 

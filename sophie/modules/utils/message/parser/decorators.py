@@ -151,5 +151,8 @@ def parse_arguments(
                 pass
             else:
                 return await func(event, *args, arguments=arguments, **kwargs)
+
+        # functools.wraps doesnt work here
+        wrapped.__module__ = func.__module__  # noqa  # FIXME
         return wrapped
     return decorator
