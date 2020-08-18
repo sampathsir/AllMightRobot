@@ -22,6 +22,7 @@ from logging import DEBUG
 from sophie.modules.utils.filters import __setup__ as filters_setup
 from sophie.modules.utils.middlewares import __setup__ as middlewares_setup
 from sophie.services.aiogram import dp, bot
+from sophie.services.mongo import __setup__ as init_mongo
 from sophie.utils.config import config
 from sophie.utils.loader import load_all_modules, post_init
 from sophie.utils.logging import log
@@ -36,6 +37,10 @@ if config.advanced.uvloop:
     import_module('sophie.utils.uvloop')
 
 loop = asyncio.get_event_loop()
+
+log.debug("Loading database...")
+init_mongo(loop)
+log.debug("...Done")
 
 log.debug('Loading top-level custom filters...')
 filters_setup()
