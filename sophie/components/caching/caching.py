@@ -16,16 +16,21 @@
 #
 # This file is part of Sophie.
 
+from __future__ import annotations
+
 import asyncio
-from typing import Any, Tuple
+import typing
 
 from aiocache import Cache
 
 from sophie.utils.config import config
 from sophie.utils.logging import log
 
+if typing.TYPE_CHECKING:
+    from aiocache.base import BaseCache
 
-def get_mode() -> Tuple[Any, dict]:
+
+def get_mode() -> typing.Tuple[typing.Any, dict]:
     conf = config.cache.mode.lower()
 
     if conf == 'memory':
@@ -55,7 +60,7 @@ def get_mode() -> Tuple[Any, dict]:
     return mode, kwargs
 
 
-def get_serializer() -> Any:
+def get_serializer() -> typing.Any:
     conf = config.cache.serializer.lower()
     if conf == 'pickle':
         from aiocache.serializers import PickleSerializer
@@ -71,7 +76,7 @@ def get_serializer() -> Any:
     return serializer
 
 
-def __setup__() -> Any:
+def __setup__() -> BaseCache:
     namespace = config.cache.namespace
 
     mode, kwargs = get_mode()
