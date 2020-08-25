@@ -21,6 +21,9 @@
 # General
 git+https://github.com/aiogram/aiogram@dev-3.x
 
+# cython for compiling pydantic
+cython
+
 # DB
 pymongo
 motor
