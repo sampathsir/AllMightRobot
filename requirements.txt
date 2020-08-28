@@ -39,6 +39,7 @@ uvloop
 toml
 
 # Other
+typing-extensions
 PyYAML
 coloredlogs
 loguru

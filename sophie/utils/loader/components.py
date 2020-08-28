@@ -19,8 +19,10 @@
 import os
 from typing import Union
 
+from pathlib import Path
+
 from sophie.utils.logging import log
-from .modules import LoadPackage
+from .modules import Package
 
 
 def load_component(component_name: str) -> Union[dict, bool]:
@@ -32,16 +34,12 @@ def load_component(component_name: str) -> Union[dict, bool]:
         return False
 
     log.debug(f"Loading component: {component_name}")
-    loader = LoadPackage()
-
-    component = loader(
-        {
-            "type": "component",
-            "name": component_name,
-            "path": f"sophie/components/{component_name}",
-            "package_path": f"sophie.components.{component_name}",
-        }
+    component = Package(
+        type='component',
+        name=component_name,
+        path=Path(f"sophie/components/{component_name}")
     )
 
     LOADED_COMPONENTS[component_name] = component
     return component
+

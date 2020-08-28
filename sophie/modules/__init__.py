@@ -25,13 +25,11 @@ from sophie.utils.logging import log
 
 class BaseModule:
     router: Optional[Union[List[Router], Router]]
+    object: object
     """Registered router(s) for the module"""
 
-    priority: Union[int, float] = float('inf')
-    """Priority of the module, if Zero (0), module will reach the updates first, defaults to inf"""
-
-    async def __setup__(*args: Any, **kwargs: Any) -> Any:
-        raise NotImplementedError("Setup function is not Implemented for this module!")
+    async def __setup__(*args: Any, **kwargs: Any) -> None:
+        pass
 
 
 def get_registered_modules() -> List:
@@ -50,7 +48,7 @@ def list_all_modules() -> list:
         if directory == '__pycache__':
             continue
 
-        if not os.path.isfile(path + '/version.txt'):
+        if directory == 'utils':
             continue
 
         if directory in all_modules:

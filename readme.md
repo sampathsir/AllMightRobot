@@ -22,7 +22,6 @@ Refer to the [our self-hosting wiki pages](https://gitlab.com/SophieBot/sophie/-
 ### Documentation
 Sophie's documentation are [available here](https://wiki.sophiebot.gq)
 
-
 ### License
 Sophie's source code licensed under AGPL. By using it you confirm that you will open your fork's source and put a link into `/about` or `/start` command of your bot.
 You also have no rights to remove copyrights lines, but you are free to add new.

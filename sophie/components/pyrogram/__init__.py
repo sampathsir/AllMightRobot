@@ -16,4 +16,14 @@
 #
 # This file is part of Sophie.
 
-from .pyrogram import pbot
+from .config import __config__
+
+
+def __pre_init__(self):
+    from .pyrogram import pbot
+    self.object.pbot = pbot
+
+
+__all__ = [
+    '__config__'
+]

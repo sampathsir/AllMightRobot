@@ -21,23 +21,26 @@ from aiogram import Router
 
 from sophie.modules import BaseModule
 
+from .handlers.owners_functions import OwnersFunctions
+
 router = Router()
 
 
-class OwnerModule(BaseModule):
-    from sophie.modules.owner.handlers.owners_functions import OwnersFunctions
+class Module(BaseModule):
     router = router
 
-    async def __setup__(*args: Any, **kwargs: Any) -> Any:
-        from .filters import __setup__ as filters
-        from .handlers import __setup__ as handlers
-        from .loader import __setup__ as loader
 
-        filters(router)
-        handlers()
-        await loader()
+async def __setup__(*args: Any, **kwargs: Any) -> Any:
+    from .filters import __setup__ as filters
+    from .handlers import __setup__ as handlers
+    from .loader import __setup__ as loader
+
+    filters(router)
+    handlers()
+    await loader(router)
 
 
 __all__ = [
-    "router"
+    "router",
+    "OwnersFunctions"
 ]

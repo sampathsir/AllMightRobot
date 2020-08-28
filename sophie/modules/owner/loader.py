@@ -18,18 +18,17 @@
 from typing import Any
 
 from sophie.utils.logging import log
-from . import router
 
 
-async def __setup__() -> Any:
+async def __setup__(router) -> Any:
     from sophie.utils.loader import LOADED_MODULES
 
     log.debug('Loading owners functions...')
 
     for module in LOADED_MODULES.values():
-        if hasattr(module['object'], 'OwnersFunctions'):
-            log.debug(f"Found owners function for {module['name']} module")
-            class_object = module['object'].OwnersFunctions
+        if hasattr(module.object, 'OwnersFunctions'):
+            log.debug(f"Found owners function for {module.name} module")
+            class_object = module.object.OwnersFunctions
 
             # Check if function needs setup operation
             if hasattr(class_object, '__setup__'):
@@ -42,7 +41,7 @@ async def __setup__() -> Any:
                 filters = {}
 
                 # Check if function is owner-only
-                if hasattr(module, 'only_owner') and module.only_owner is True:  # type: ignore
+                if hasattr(module, 'only_owner') and module.only_owner is True:
                     filters['is_owner'] = True
                 else:
                     filters['is_op'] = True
@@ -52,7 +51,7 @@ async def __setup__() -> Any:
                 router.message.register(module, **filters)  # type: ignore
                 log.debug('..Done')
         else:
-            log.debug(f"Not found owners function for {module['name']} module, skipping...")
+            log.debug(f"Not found owners function for {module.name} module, skipping...")
             continue
 
     log.debug("...Done")

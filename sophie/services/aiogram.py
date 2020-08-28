@@ -15,7 +15,7 @@
 #
 # This file is part of Sophie.
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, Router
 
 from sophie.utils.config import config
 from sophie.utils.logging import log
@@ -25,3 +25,6 @@ log.debug('Starting Aiogram...')
 TOKEN = config.general.token
 bot = Bot(TOKEN, parse_mode="HTML")
 dp = Dispatcher()
+
+modules_router = Router()
+dp.include_router(modules_router)

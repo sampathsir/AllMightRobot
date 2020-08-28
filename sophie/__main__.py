@@ -16,47 +16,27 @@
 # This file is part of Sophie.
 
 import asyncio
-from importlib import import_module
 from logging import DEBUG
 
-from sophie.modules.utils.filters import __setup__ as filters_setup
-from sophie.modules.utils.middlewares import __setup__ as middlewares_setup
 from sophie.services.aiogram import dp, bot
-from sophie.utils.config import config
-from sophie.utils.loader import load_all_modules, post_init
 from sophie.utils.logging import log
+from sophie.utils.config import config
+
+from sophie.utils.loader import load_all
 from sophie.utils.migrator.migrator import __setup__ as migrator
 
 if config.advanced.debug:
     log.setLevel(DEBUG)
     log.warning("! Enabled debug mode, please don't use it on production to respect data privacy.")
 
-if config.advanced.uvloop:
-    log.info("Enabling uvloop...")
-    import_module('sophie.utils.uvloop')
-
 loop = asyncio.get_event_loop()
 
-log.debug('Loading top-level custom filters...')
-filters_setup()
-log.debug('...Done!')
-
-log.debug('Loading modules...')
-load_all_modules()
-log.info('Modules loaded successfully!')
+load_all()
 
 if config.advanced.migrator:
     log.info("Checking database migration status...")
-    migrator(loop)
+    loop.run_until_complete(migrator())
     log.info('...Done!')
-
-log.debug('Loading middlewares...')
-middlewares_setup()
-log.debug('...Done!')
-
-log.debug('Running postinit stage...')
-post_init()
-log.debug('...Done!')
 
 log.info('Running the bot...')
 loop.run_until_complete(dp.start_polling(bot))

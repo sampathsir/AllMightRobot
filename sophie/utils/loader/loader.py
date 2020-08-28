@@ -17,21 +17,22 @@
 # This file is part of Sophie.
 
 import asyncio
-from typing import Any, ValuesView
+from typing import ValuesView, Any
 
+from sophie.modules.utils.filters import __setup__ as filters_setup
+from sophie.modules.utils.middlewares import __setup__ as middlewares_setup
 from sophie.utils.logging import log
+from .modules import load_all_modules
 
 
-async def before_srv_task(modules: ValuesView[dict]) -> Any:
-    log.debug("Running __setup__...")
-    for module in [m for m in modules if hasattr(m['object'], '__setup__')]:
-        log.debug(f"Running __setup__ for: {module['name']}")
-        await module['object'].__setup__()
+async def before_srv_task(packages: ValuesView[dict]) -> Any:
+    for package in [m for m in packages if hasattr(m.object, '__setup__')]:
+        log.debug(f"Running __setup__ for: {package.name}")
+        await package.object.__setup__()
 
-    log.debug("Running __before_serving__...")
-    for module in [m for m in modules if hasattr(m['object'], '__before_serving__')]:
-        log.debug(f"Running __before_serving__ for: {module['name']}")
-        await module['object'].__before_serving__()
+    for package in [m for m in packages if hasattr(m.object, '__before_serving__')]:
+        log.debug(f"Running __before_serving__ for: {package.name}")
+        await package.object.__before_serving__()
 
 
 def post_init() -> Any:
@@ -39,9 +40,29 @@ def post_init() -> Any:
     from . import LOADED_COMPONENTS
 
     # Run before_srv_task for components
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(before_srv_task(LOADED_COMPONENTS.values()))
+    log.debug("Running before_srv_task for components...")
+    asyncio.run(before_srv_task(LOADED_COMPONENTS.values()))
+    log.debug("...Done!")
 
     # Run before_srv_task for modules
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(before_srv_task(LOADED_MODULES.values()))
+    log.debug("Running before_srv_task for modules...")
+    asyncio.run(before_srv_task(LOADED_MODULES.values()))
+    log.debug("...Done!")
+
+
+def load_all() -> None:
+    log.debug('Loading top-level custom filters...')
+    filters_setup()
+    log.debug('...Done!')
+
+    log.debug('Loading modules...')
+    load_all_modules()
+    log.info('Modules loaded successfully!')
+
+    log.debug('Loading middlewares...')
+    middlewares_setup()
+    log.debug('...Done!')
+
+    log.debug('Running postinit stage...')
+    post_init()
+    log.debug('...Done!')

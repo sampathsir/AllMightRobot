@@ -18,15 +18,17 @@
 
 from typing import Dict
 
-from .loader import post_init
+from .loader import post_init, load_all
 from .modules import load_all_modules
+from .package import Package
 
-LOADED_MODULES: Dict[str, dict] = {}
-LOADED_COMPONENTS: Dict[str, dict] = {}
+LOADED_MODULES: Dict[str, "Package"] = {}
+LOADED_COMPONENTS: Dict[str, "Package"] = {}
 
 __all__ = [
     "LOADED_MODULES",
     "LOADED_COMPONENTS",
     "post_init",
-    "load_all_modules"
+    "load_all_modules",
+    "load_all"
 ]

@@ -20,7 +20,7 @@ import enum
 from typing import Any, Optional
 from pymongo import ASCENDING, IndexModel
 
-from sophie.services.mongo import sync_mongo, Document
+from sophie.services.mongo import mongo, Document
 from sophie.utils.logging import log
 
 col_name = 'migrator'
@@ -65,9 +65,9 @@ async def get_current_version(loaded_name: str, loaded_type: str) -> Optional[in
     return data.version
 
 
-async def set_version(loaded_name: str, loaded_type: str, version: int) -> int:
+async def set_version(package_name: str, package_type: str, version: int) -> int:
     await MigrationDB.collection().update_one(
-        {'name': loaded_name, 'type': loaded_type},
+        {'name': package_name, 'type': package_type},
         {'$set': {'version': version}},
         upsert=True
     )
@@ -75,9 +75,9 @@ async def set_version(loaded_name: str, loaded_type: str, version: int) -> int:
 
 
 async def __setup__() -> Any:
-    if col_name not in sync_mongo.list_collection_names():
+    if col_name not in await mongo.list_collection_names():
         log.info(f'Created not exited column "{col_name}"')
-        sync_mongo.create_collection(col_name)
+        await mongo.create_collection(col_name)
 
     log.debug(f'Creating indexes for "{col_name}" column')
     await MigrationDB.init_indexes()

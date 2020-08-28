@@ -29,11 +29,11 @@ def load_all_languages() -> None:
     from sophie.utils.loader import LOADED_MODULES
 
     for module in LOADED_MODULES.values():
-        log.debug(f"Loading localizations from {module['name']} module")
+        log.debug(f"Loading localizations from {module.name} module")
 
-        path = f"{module['path']}/translations"
-        if not os.path.exists(path):
-            log.debug(f"No translations directory found for module {module['name']}")
+        path = module.path / "translations"
+        if not path.exists():
+            log.debug(f"No translations directory found for module {module.name}")
             continue
 
         for file_name in os.listdir(path):
@@ -41,13 +41,13 @@ def load_all_languages() -> None:
             with open(f"{path}/{file_name}") as f:
                 lang = yaml.load(f, Loader=yaml.SafeLoader)
 
-                if 'translations' not in LOADED_MODULES[module['name']]:
-                    LOADED_MODULES[module['name']]['translations'] = {}
+                if not hasattr(module.object, 'translations'):
+                    module.object.translations = {}
 
                 if lang_name not in LANGUAGES:
                     LANGUAGES.append(lang_name)
 
-                LOADED_MODULES[module['name']]['translations'][lang_name] = lang
+                module.object.translations[lang_name] = lang
 
 
 def __setup__() -> Any:

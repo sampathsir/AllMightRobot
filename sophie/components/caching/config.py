@@ -15,36 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # This file is part of Sophie.
-#
 
-import logging as log
-import json
-
-from pydantic import BaseSettings, ValidationError
-
-from .general import (
-    GeneralConfig,
-    AdvancedConfig,
-    ModuleConfig,
-    ComponentConfig,
-    MongoConfig,
-    general_config
-)
+from pydantic import BaseModel
 
 
-class Conf(BaseSettings):
-    # Some fields are required, some can follow default value
-    general = GeneralConfig()
-    advanced = AdvancedConfig()
-    module = ModuleConfig()
-    component = ComponentConfig()
-    mongo = MongoConfig()
-
-
-real_config = {}
-with open('config/config.json') as f:
-    real_config = json.load(f)
-
-config = Conf.parse_obj(real_config)
-
-__all__ = ["config"]
+class __config__(BaseModel):
+    mode: str = 'memory'
+    namespace: str = 'sophie'
+    serializer: str = 'json'
+    url: str = 'localhost:6379'

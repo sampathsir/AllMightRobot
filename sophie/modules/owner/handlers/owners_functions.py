@@ -44,8 +44,8 @@ class OwnersFunctions:
         }, title='Stats')
 
         for module in LOADED_MODULES.values():
-            if hasattr(module['object'], '__stats__'):
-                text_list = module['object'].__stats__(text_list)
+            if hasattr(module.object, '__stats__'):
+                text_list = module.object.__stats__(text_list)
 
         await message.reply(text_list.text)
 
@@ -55,13 +55,13 @@ class OwnersFunctions:
 
         data = []
         for module in LOADED_MODULES.values():
-            args = {'ver': module['version']}
+            args = {'ver': module.version}
 
             # Show database version. Reference to /sophie/utils/migrator.py
-            if 'current_db_version' in module:
-                args['db'] = module['current_db_version']
+            if hasattr(module, 'current_db_version'):
+                args['db'] = module.current_db_version
 
-            data.append((module['name'], args))
+            data.append((module.name, args))
 
         # Convert list to tuple, to make FormatListText understand this as typed list
         await message.reply(FormatListText(tuple(data), title='Loaded modules').text)

@@ -16,7 +16,6 @@
 #
 # This file is part of Sophie.
 
-import asyncio
 import logging
 
 from pyrogram import Client
@@ -27,8 +26,8 @@ from sophie.utils.logging import log
 TOKEN = config.general.token
 session_name = TOKEN.split(':')[0]
 
-API_ID = config.pyrogram.app_id
-API_HASH = config.pyrogram.app_hash
+API_ID = config.component.pyrogram.app_id
+API_HASH = config.component.pyrogram.app_hash
 
 log.debug('Starting 🔥Pyrogram...')
 
@@ -41,4 +40,3 @@ pbot = Client(
 
 # disable logging for pyrogram [not for ERROR logging]
 logging.getLogger('pyrogram').setLevel(level=logging.ERROR)
-asyncio.ensure_future(pbot.start())

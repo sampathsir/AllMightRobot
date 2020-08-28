@@ -1,6 +1,8 @@
 venv/
 logs/
 config/config.toml
+config/config.json
 *.pyc
 __pycache__/
 .idea/
+*.session

@@ -22,7 +22,7 @@ import os
 from typing import List, MutableMapping
 
 import toml
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Extra
 
 from .field import Field
 
@@ -46,8 +46,16 @@ class AdvancedConfig(BaseModel):  # Advanced settings
 
 
 class ModuleConfig(BaseModel):
-    load: List[str] = Field(['owner'], env="TO_LOAD")
+    load: List[str] = Field([], env="TO_LOAD")
     dont_load: List[str] = Field([], env="DONT_LOAD")
+
+    class Config:
+        extra = Extra.allow
+
+
+class ComponentConfig(BaseModel):
+    class Config:
+        extra = Extra.allow
 
 
 class MongoConfig(BaseModel):  # settings for database

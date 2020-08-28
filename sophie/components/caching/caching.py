@@ -26,7 +26,7 @@ from sophie.utils.logging import log
 
 
 def get_mode() -> Tuple[Any, dict]:
-    conf = config.cache.mode.lower()
+    conf = config.component.caching.mode.lower()
 
     if conf == 'memory':
         from aiocache import SimpleMemoryCache
@@ -38,16 +38,14 @@ def get_mode() -> Tuple[Any, dict]:
 
         mode = RedisCache
         kwargs = {
-            'endpoint': config.cache.redis.url,
-            'port': config.cache.redis.port
+            'endpoint': config.component.caching.url
         }
     elif conf == 'memcached':
         from aiocache import MemcachedCache
 
         mode = MemcachedCache
         kwargs = {
-            'endpoint': config.cache.memcached.url,
-            'port': config.cache.memcached.port
+            'endpoint': config.component.caching.url
         }
     else:
         raise NotImplementedError
@@ -56,7 +54,7 @@ def get_mode() -> Tuple[Any, dict]:
 
 
 def get_serializer() -> Any:
-    conf = config.cache.serializer.lower()
+    conf = config.component.caching.serializer.lower()
     if conf == 'pickle':
         from aiocache.serializers import PickleSerializer
 
@@ -72,7 +70,7 @@ def get_serializer() -> Any:
 
 
 def __setup__() -> Any:
-    namespace = config.cache.namespace
+    namespace = config.component.caching.namespace
 
     mode, kwargs = get_mode()
     serializer = get_serializer()

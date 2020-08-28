@@ -1,4 +1,5 @@
 # Copyright (C) 2018 - 2020 MrYacha.
+# Copyright (C) 2020 Jeepeo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,9 +16,9 @@
 #
 # This file is part of Sophie.
 
-import asyncio
+from pydantic import BaseModel
 
-import uvloop
 
-loop_policy = uvloop.EventLoopPolicy()
-asyncio.set_event_loop_policy(loop_policy)
+class __config__(BaseModel):
+    app_id: int = 0
+    app_hash: str = ''

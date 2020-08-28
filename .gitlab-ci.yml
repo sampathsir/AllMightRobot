@@ -81,6 +81,7 @@ docker_latest:
   only:
     - stable
 
+
 docker_version:
   # Builds docker image with version tags
   image: docker:latest

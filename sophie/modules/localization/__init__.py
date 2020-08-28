@@ -23,10 +23,11 @@ from sophie.modules import BaseModule
 router = Router()
 
 
-class LocalizationModule(BaseModule):
+class Module(BaseModule):
     router = router
 
-    async def __setup__(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
-        from .handlers import __setup__ as handlers
 
-        handlers()
+async def __setup__(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+    from .handlers import __setup__ as handlers
+
+    handlers()

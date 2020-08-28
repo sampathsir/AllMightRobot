@@ -18,6 +18,6 @@
 #
 
 from .field import Field
-from .config import config
+from .config import config, real_config
 
-__all__ = ["Field", "config"]
+__all__ = ["Field", "config", "real_config"]

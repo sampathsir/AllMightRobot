@@ -16,6 +16,15 @@
 #
 # This file is part of Sophie.
 
-from .caching import __setup__ as caching
+from .config import __config__
 
-cache = caching()
+
+def __pre_init__(self):
+    from .caching import __setup__ as caching
+    self.object.cache = caching()
+
+
+__all__ = [
+    '__config__'
+]
+

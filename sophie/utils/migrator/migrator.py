@@ -36,46 +36,46 @@ typed_loaded = {
 }
 
 
-def __setup__(loop: AbstractEventLoop) -> Any:
-    loop.run_until_complete(setup_db())
-    loop.run_until_complete(migrate_check())
+async def __setup__() -> None:
+    await setup_db()
+    await migrate_check()
 
 
-async def migrate_check() -> Any:
-    for loaded in [*LOADED_MODULES.values(), *LOADED_COMPONENTS.values()]:
-        log.debug(f"Running migration check for {loaded['name']} {loaded['type']}...")
-        latest_version = set_latest_version(loaded)
+async def migrate_check() -> None:
+    for package in [*LOADED_MODULES.values(), *LOADED_COMPONENTS.values()]:
+        log.debug(f"Running migration check for {package.name} {package.type}...")
+        latest_version = set_latest_version(package)
         if latest_version:
-            await migrate(loaded, latest_version)
-        await set_current_version(loaded)
+            await migrate(package, latest_version)
+        await set_current_version(package)
 
 
-def set_latest_version(loaded: dict) -> Optional[int]:
-    if not os.path.exists(loaded['path'] + '/migrate'):
-        log.debug(f"Not found migrate dir for {loaded['name']}, skipping.")
-        return None
+def set_latest_version(package: dict) -> Optional[int]:
+    if not (package.path / 'migrate').exists():
+        log.debug(f"Not found migrate dir for {package.name}, skipping.")
+        return
 
-    version_file_path = loaded['path'] + '/migrate/version.txt'
+    version_file_path = package.path / 'migrate/version.txt'
 
     if not os.path.exists(version_file_path):
-        log.error(f"Not found database version file for {loaded['name']}")
+        log.error(f"Not found database version file for {package.name}")
         exit(3)
 
     with open(version_file_path) as f:
         latest_version = int(f.read())
 
-    typed_loaded[loaded['type']][loaded['name']]['latest_db_version'] = latest_version
+    typed_loaded[package.type][package.name]['latest_db_version'] = latest_version
 
     return latest_version
 
 
-async def set_current_version(loaded: dict) -> Optional[int]:
-    current_version = await get_current_version(loaded['name'], loaded['type'])
-    typed_loaded[loaded['type']][loaded['name']]['current_db_version'] = current_version
+async def set_current_version(package: dict) -> Optional[int]:
+    current_version = await get_current_version(package.name, package.type)
+    typed_loaded[package.type][package.name].current_db_version = current_version
     return current_version
 
 
-async def migrate(loaded: dict, latest_version: int) -> Any:
+async def migrate(loaded: dict, latest_version: int) -> None:
     current_version = await get_current_version(loaded['name'], loaded['type'])
     # Check if loaded was never migrated before
     if current_version is None:
