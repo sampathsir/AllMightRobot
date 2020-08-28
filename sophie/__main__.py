@@ -19,7 +19,6 @@ import asyncio
 from logging import DEBUG
 
 from sophie.services.aiogram import dp, bot
-from sophie.services.mongo import __setup__ as init_mongo
 from sophie.utils.logging import log
 from sophie.utils.config import config
 
@@ -31,11 +30,6 @@ if config.advanced.debug:
     log.warning("! Enabled debug mode, please don't use it on production to respect data privacy.")
 
 loop = asyncio.get_event_loop()
-
-
-log.debug("Loading database...")
-init_mongo(loop)
-log.debug("...Done")
 
 load_all()
 

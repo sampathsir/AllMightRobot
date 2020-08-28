@@ -20,28 +20,35 @@ from __future__ import annotations
 
 import typing
 
+from motor.motor_asyncio import AsyncIOMotorClient
+from motor_odm import Document
+from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 
-from .mongo import sync_mongo, mongo_client
-from .motor import __init_motor__, Document
+from sophie.utils.config import config
 from sophie.utils.logging import log
 
 if typing.TYPE_CHECKING:
-    from asyncio import AbstractEventLoop
     from motor.core import AgnosticDatabase
+    from pymongo.database import Database
 
-mongo: AgnosticDatabase = None  # noqa  # to be populated
+MONGO_URI = config.mongo.url
+MONGO_DB = config.mongo.namespace
 
+# Init MongoDB
+mongo_client = MongoClient(MONGO_URI)
+sync_mongo: Database = mongo_client[MONGO_DB]
 
-def __setup__(loop: AbstractEventLoop) -> typing.Any:
-    global mongo
-    mongo = __init_motor__(loop)
+# Async mongo
+motor = AsyncIOMotorClient(MONGO_URI)
+mongo: AgnosticDatabase = motor[MONGO_DB]
 
-    try:
-        mongo_client.server_info()
-    except ServerSelectionTimeoutError:
-        log.critical("Can't connect to the MongoDB! Exiting...")
-        exit(2)
+Document.use(mongo)
 
+try:
+    mongo_client.server_info()
+except ServerSelectionTimeoutError:
+    log.critical("Can't connect to the MongoDB! Exiting...")
+    exit(2)
 
-__all__ = ["mongo", "sync_mongo", "Document", "__setup__"]
+__all__ = ["sync_mongo", "mongo", "Document"]
