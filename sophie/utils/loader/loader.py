@@ -35,22 +35,22 @@ async def before_srv_task(packages: ValuesView[dict]) -> Any:
         await package.p_object.__before_serving__()
 
 
-def post_init() -> Any:
+def post_init(loop) -> Any:
     from . import LOADED_MODULES
     from . import LOADED_COMPONENTS
 
     # Run before_srv_task for components
     log.debug("Running before_srv_task for components...")
-    asyncio.run(before_srv_task(LOADED_COMPONENTS.values()))
+    loop.run_until_complete(before_srv_task(LOADED_COMPONENTS.values()))
     log.debug("...Done!")
 
     # Run before_srv_task for modules
     log.debug("Running before_srv_task for modules...")
-    asyncio.run(before_srv_task(LOADED_MODULES.values()))
+    loop.run_until_complete(before_srv_task(LOADED_MODULES.values()))
     log.debug("...Done!")
 
 
-def load_all() -> None:
+def load_all(loop) -> None:
     log.debug('Loading top-level custom filters...')
     filters_setup()
     log.debug('...Done!')
@@ -64,5 +64,5 @@ def load_all() -> None:
     log.debug('...Done!')
 
     log.debug('Running postinit stage...')
-    post_init()
+    post_init(loop)
     log.debug('...Done!')

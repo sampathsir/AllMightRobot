@@ -57,4 +57,4 @@ async def __setup__() -> typing.Any:
         sync_mongo.create_collection(col_name)
 
     log.debug(f'Creating indexes for "{col_name}" column')
-    # await LocalizationDB.init_indexes()
+    await LocalizationDB.init_indexes()

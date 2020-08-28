@@ -24,7 +24,6 @@ from sophie.utils.logging import log
 from sophie.utils.config import config
 
 from sophie.utils.loader import load_all
-from sophie.utils.migrator.migrator import __setup__ as migrator
 
 if config.advanced.debug:
     log.setLevel(DEBUG)
@@ -37,10 +36,11 @@ log.debug("Loading database...")
 init_mongo(loop)
 log.debug("...Done")
 
-load_all()
-
+load_all(loop)
 
 if config.advanced.migrator:
+    from sophie.utils.migrator.migrator import __setup__ as migrator
+
     log.info("Checking database migration status...")
     loop.run_until_complete(migrator())
     log.info('...Done!')
