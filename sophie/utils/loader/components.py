@@ -25,7 +25,7 @@ from sophie.utils.logging import log
 from .modules import Package
 
 
-def load_component(component_name: str) -> Union[dict, bool]:
+def load_component(component_name: str) -> Union[Package, bool]:
     from . import LOADED_COMPONENTS
 
     base_path = 'sophie/components/'
@@ -42,4 +42,3 @@ def load_component(component_name: str) -> Union[dict, bool]:
 
     LOADED_COMPONENTS[component_name] = component
     return component
-

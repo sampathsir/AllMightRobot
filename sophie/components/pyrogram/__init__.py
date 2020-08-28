@@ -16,10 +16,11 @@
 #
 # This file is part of Sophie.
 
+import typing
 from .config import __config__
 
 
-def __pre_init__(self):
+def __pre_init__(self) -> typing.Any:
     from .pyrogram import pbot
     self.object.pbot = pbot
 

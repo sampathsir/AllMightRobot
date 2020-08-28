@@ -18,10 +18,7 @@
 #
 # Contains general/Core config model
 
-import os
-from typing import List, MutableMapping
-
-import toml
+from typing import List, TYPE_CHECKING
 from pydantic import BaseModel, validator, Extra
 
 from .field import Field
@@ -54,6 +51,18 @@ class ModuleConfig(BaseModel):
 
 
 class ComponentConfig(BaseModel):
+    if TYPE_CHECKING:
+        # Dynamically filled; defined here for type hints and calming mypy
+
+        from sophie.components.pyrogram import __config__ as pyroConfig
+        pyrogram: pyroConfig
+
+        from sophie.components.localization import __config__ as localizationConfig
+        localization: localizationConfig
+
+        from sophie.components.caching import __config__ as cacheConfig
+        caching: cacheConfig
+
     class Config:
         extra = Extra.allow
 
@@ -61,17 +70,3 @@ class ComponentConfig(BaseModel):
 class MongoConfig(BaseModel):  # settings for database
     url: str = Field('localhost', env="MONGO_URL")
     namespace: str = Field('sophie', env="MONGO_NAMESPACE")
-
-
-def __conf__() -> MutableMapping[str, dict]:  # method to load general config.toml
-    path = 'config/config.toml'
-
-    if os.name == 'nt':
-        path.replace('/', '\\')
-
-    with open(path) as file:
-        payload = toml.load(file)
-    return payload
-
-
-general_config = __conf__()

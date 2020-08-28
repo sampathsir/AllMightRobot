@@ -17,10 +17,9 @@
 # This file is part of Sophie.
 #
 
-import logging as log
 import json
 
-from pydantic import BaseSettings, ValidationError
+from pydantic import BaseSettings
 
 from .general import (
     GeneralConfig,
@@ -28,7 +27,6 @@ from .general import (
     ModuleConfig,
     ComponentConfig,
     MongoConfig,
-    general_config
 )
 
 
@@ -41,7 +39,6 @@ class Conf(BaseSettings):
     mongo = MongoConfig()
 
 
-real_config = {}
 with open('config/config.json') as f:
     real_config = json.load(f)
 

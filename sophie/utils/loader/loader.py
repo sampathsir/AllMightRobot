@@ -16,16 +16,20 @@
 #
 # This file is part of Sophie.
 
-import asyncio
-from typing import ValuesView, Any
+from __future__ import annotations
+
+from typing import ValuesView, Any, TYPE_CHECKING
 
 from sophie.modules.utils.filters import __setup__ as filters_setup
 from sophie.modules.utils.middlewares import __setup__ as middlewares_setup
 from sophie.utils.logging import log
 from .modules import load_all_modules
 
+if TYPE_CHECKING:
+    from .package import Package
 
-async def before_srv_task(packages: ValuesView[dict]) -> Any:
+
+async def before_srv_task(packages: ValuesView[Package]) -> Any:
     for package in [m for m in packages if hasattr(m.p_object, '__setup__')]:
         log.debug(f"Running __setup__ for: {package.name}")
         await package.p_object.__setup__()

@@ -18,7 +18,7 @@
 
 from importlib import import_module
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, cast
 
 from aiogram import Router
 
@@ -34,7 +34,7 @@ class Package:
     p_object: BaseModule
     version: Union[str, None] = None
 
-    def __init__(self, type: str, name: str, path: Path):
+    def __init__(self, type: str, name: str, path: Path):  # noqa: A002
         self.type = type
         self.name = name
         self.path = path
@@ -52,7 +52,7 @@ class Package:
                 log.debug("...Done!")
 
         log.debug(f"Importing {self.name} package...")
-        self.p_object: BaseModule = import_module(self.python_path)
+        self.p_object: BaseModule = cast(BaseModule, import_module(self.python_path))
 
         version_file = self.path / 'version.txt'
         if version_file.exists():
@@ -78,15 +78,15 @@ class Package:
     def _load_module(self) -> None:
         from sophie.services.aiogram import modules_router
 
-        self.module = self.p_object.Module
+        self.module = self.p_object
 
         # Load routers
-        if hasattr(self.p_object.Module, 'router'):
-            self.routers = self.p_object.Module.router
+        if self.module.router:
 
             log.debug(f"Loading router(s) for {self.name} {self.type}...")
-            if type(self.routers) is not list:
-                self.routers = [self.routers]
+            if not isinstance(self.module.router, list):
+                self.routers = [self.module.router]
+            self.routers = self.routers
 
             # Include routers
             for router in self.routers:

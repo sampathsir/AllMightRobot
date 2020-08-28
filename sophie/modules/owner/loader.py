@@ -15,12 +15,16 @@
 #
 # This file is part of Sophie.
 
-from typing import Any
+from __future__ import annotations
+from typing import Any, TYPE_CHECKING
 
 from sophie.utils.logging import log
 
+if TYPE_CHECKING:
+    from aiogram import Router
 
-async def __setup__(router) -> Any:
+
+async def __setup__(router: Router) -> Any:
     from sophie.utils.loader import LOADED_MODULES
 
     log.debug('Loading owners functions...')
