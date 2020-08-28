@@ -36,7 +36,7 @@ def get_babel(locale_code: str) -> Locale:
 def get_language_name(locale_code: str) -> str:
     babel = get_babel(locale_code)
 
-    if config.localization.languages_names_in_english:
+    if config.component.localization.languages_names_in_english:
         return babel.english_name
     else:
         return babel.display_name

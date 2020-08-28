@@ -1,4 +1,5 @@
 # Copyright (C) 2018 - 2020 MrYacha.
+# Copyright (C) 2020 Jeepeo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,26 +16,9 @@
 #
 # This file is part of Sophie.
 
-from __future__ import annotations
-
-import typing
-
-from sophie.components.caching.cached import cached
-from sophie.utils.config import config
-from .db.locale import get_lang, set_lang
-
-if typing.TYPE_CHECKING:
-    from .db.locale import LocalizationDB
+from pydantic import BaseModel
 
 
-@cached()
-async def get_chat_locale(chat_id: int) -> str:
-    lang = await get_lang(chat_id)
-    if not lang:
-        return config.component.localization.default_language
-
-    return lang.locale_code
-
-
-async def set_chat_locale(chat_id: int, locale_code: str) -> typing.Optional[LocalizationDB]:
-    return await set_lang(chat_id, locale_code)
+class __config__(BaseModel):
+    default_language: str = 'en-US'
+    languages_names_in_english: bool = False

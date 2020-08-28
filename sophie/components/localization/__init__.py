@@ -18,6 +18,9 @@
 from sophie.utils.logging import log
 
 
+from .config import __config__
+
+
 async def __setup__() -> bool:
     from .loader import __setup__ as load_all_languages
     from .db import __setup__ as database
@@ -31,3 +34,8 @@ async def __setup__() -> bool:
     log.debug('...Done!')
 
     return True
+
+
+__all__ = [
+    '__config__'
+]
