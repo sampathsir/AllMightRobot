@@ -16,13 +16,13 @@
 # This file is part of Sophie.
 
 import os
-from typing import Any
+from typing import Any, List
 
 import yaml
 
 from sophie.utils.logging import log
 
-LANGUAGES = []
+LANGUAGES: List[str] = []
 
 
 def load_all_languages() -> None:

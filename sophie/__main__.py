@@ -19,6 +19,7 @@ import asyncio
 from logging import DEBUG
 
 from sophie.services.aiogram import dp, bot
+from sophie.services.mongo import __setup__ as init_mongo
 from sophie.utils.logging import log
 from sophie.utils.config import config
 
@@ -31,7 +32,13 @@ if config.advanced.debug:
 
 loop = asyncio.get_event_loop()
 
+
+log.debug("Loading database...")
+init_mongo(loop)
+log.debug("...Done")
+
 load_all()
+
 
 if config.advanced.migrator:
     log.info("Checking database migration status...")

@@ -16,13 +16,19 @@
 #
 # This file is part of Sophie.
 
+from __future__ import annotations
+
 import asyncio
-from typing import Any, Tuple
+import typing
 
 from aiocache import Cache
 
 from sophie.utils.config import config
 from sophie.utils.logging import log
+
+if typing.TYPE_CHECKING:
+    from typing import Tuple, Any
+    from aiocache.base import BaseCache
 
 
 def get_mode() -> Tuple[Any, dict]:
@@ -69,7 +75,7 @@ def get_serializer() -> Any:
     return serializer
 
 
-def __setup__() -> Any:
+def __setup__() -> BaseCache:
     namespace = config.component.caching.namespace
 
     mode, kwargs = get_mode()

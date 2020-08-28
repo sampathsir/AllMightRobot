@@ -17,7 +17,7 @@
 
 import typing
 
-from pydantic import constr
+from pydantic import Field
 from pymongo import IndexModel, ASCENDING, ReturnDocument
 
 from sophie.services.mongo import sync_mongo, Document
@@ -25,15 +25,10 @@ from sophie.utils.logging import log
 
 col_name = 'locale'
 
-if typing.TYPE_CHECKING:
-    LocaleCode = str
-else:
-    LocaleCode = constr(regex="^[a-z]{2}-[A-Z]{2}$")
-
 
 class LocalizationDB(Document):
     chat_id: int
-    locale_code: LocaleCode
+    locale_code: str = Field(..., regex=r"^[a-z]{2}-[A-Z]{2}$")
 
     class Mongo:
         collection = col_name
