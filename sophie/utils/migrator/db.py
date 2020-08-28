@@ -80,4 +80,4 @@ async def __setup__() -> Any:
         await mongo.create_collection(col_name)
 
     log.debug(f'Creating indexes for "{col_name}" column')
-    await MigrationDB.init_indexes()
+    # await MigrationDB.init_indexes()

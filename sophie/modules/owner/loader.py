@@ -26,9 +26,9 @@ async def __setup__(router) -> Any:
     log.debug('Loading owners functions...')
 
     for module in LOADED_MODULES.values():
-        if hasattr(module.object, 'OwnersFunctions'):
+        if hasattr(module.p_object, 'OwnersFunctions'):
             log.debug(f"Found owners function for {module.name} module")
-            class_object = module.object.OwnersFunctions
+            class_object = module.p_object.OwnersFunctions
 
             # Check if function needs setup operation
             if hasattr(class_object, '__setup__'):

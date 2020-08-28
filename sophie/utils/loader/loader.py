@@ -26,13 +26,13 @@ from .modules import load_all_modules
 
 
 async def before_srv_task(packages: ValuesView[dict]) -> Any:
-    for package in [m for m in packages if hasattr(m.object, '__setup__')]:
+    for package in [m for m in packages if hasattr(m.p_object, '__setup__')]:
         log.debug(f"Running __setup__ for: {package.name}")
-        await package.object.__setup__()
+        await package.p_object.__setup__()
 
-    for package in [m for m in packages if hasattr(m.object, '__before_serving__')]:
+    for package in [m for m in packages if hasattr(m.p_object, '__before_serving__')]:
         log.debug(f"Running __before_serving__ for: {package.name}")
-        await package.object.__before_serving__()
+        await package.p_object.__before_serving__()
 
 
 def post_init() -> Any:

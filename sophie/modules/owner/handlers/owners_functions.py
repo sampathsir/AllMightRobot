@@ -44,8 +44,8 @@ class OwnersFunctions:
         }, title='Stats')
 
         for module in LOADED_MODULES.values():
-            if hasattr(module.object, '__stats__'):
-                text_list = module.object.__stats__(text_list)
+            if hasattr(module.p_object, '__stats__'):
+                text_list = module.p_object.__stats__(text_list)
 
         await message.reply(text_list.text)
 

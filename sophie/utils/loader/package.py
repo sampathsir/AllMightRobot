@@ -31,7 +31,7 @@ from sophie.utils.config import real_config, config
 
 class Package:
     routers: List[Router]
-    object: BaseModule
+    p_object: BaseModule
     version: Union[str, None] = None
 
     def __init__(self, type: str, name: str, path: Path):
@@ -52,22 +52,22 @@ class Package:
                 log.debug("...Done!")
 
         log.debug(f"Importing {self.name} package...")
-        self.object: BaseModule = import_module(self.python_path)
+        self.p_object: BaseModule = import_module(self.python_path)
 
         version_file = self.path / 'version.txt'
         if version_file.exists():
             with open(version_file) as f:
                 self.version = f.read()
 
-        if hasattr(self.object, '__config__'):
+        if hasattr(self.p_object, '__config__'):
             log.debug(f"Setting config for {self.name} package")
-            setattr(getattr(config, self.type), self.name, self.object.__config__().parse_obj(
+            setattr(getattr(config, self.type), self.name, self.p_object.__config__().parse_obj(
                 real_config[self.type][self.name] if self.name in real_config[self.type] else {}
             ))
 
-        if hasattr(self.object, '__pre_init__'):
+        if hasattr(self.p_object, '__pre_init__'):
             log.debug(f"Running __pre_init__ of {self.name} package...")
-            self.object.__pre_init__(self)
+            self.p_object.__pre_init__(self)
             log.debug("...Done")
 
         if self.type == 'module':
@@ -75,15 +75,14 @@ class Package:
 
         log.debug("...Done!")
 
-
     def _load_module(self) -> None:
         from sophie.services.aiogram import modules_router
 
-        self.module = self.object.Module
+        self.module = self.p_object.Module
 
         # Load routers
-        if hasattr(self.object.Module, 'router'):
-            self.routers = self.object.Module.router
+        if hasattr(self.p_object.Module, 'router'):
+            self.routers = self.p_object.Module.router
 
             log.debug(f"Loading router(s) for {self.name} {self.type}...")
             if type(self.routers) is not list:
@@ -92,4 +91,4 @@ class Package:
             # Include routers
             for router in self.routers:
                 modules_router.include_router(router)
-            log.debug(f"...Done")
+            log.debug("...Done")

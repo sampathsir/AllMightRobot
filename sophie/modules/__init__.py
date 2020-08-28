@@ -25,7 +25,7 @@ from sophie.utils.logging import log
 
 class BaseModule:
     router: Optional[Union[List[Router], Router]]
-    object: object
+    p_object: object
     """Registered router(s) for the module"""
 
     async def __setup__(*args: Any, **kwargs: Any) -> None:

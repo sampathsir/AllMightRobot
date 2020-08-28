@@ -21,10 +21,9 @@ from .config import __config__
 
 def __pre_init__(self):
     from .caching import __setup__ as caching
-    self.object.cache = caching()
+    self.p_object.cache = caching()
 
 
 __all__ = [
     '__config__'
 ]
-
