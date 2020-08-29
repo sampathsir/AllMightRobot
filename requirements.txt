@@ -38,9 +38,6 @@ cryptg
 cryptography
 uvloop
 
-# Config files
-toml
-
 # Other
 typing-extensions
 PyYAML
