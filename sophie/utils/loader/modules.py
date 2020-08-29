@@ -20,7 +20,7 @@ from typing import List
 
 from pathlib import Path
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 from sophie.utils.logging import log
 from .package import Module
 
@@ -44,8 +44,8 @@ def load_modules(to_load: List[str]) -> list:
 def load_all_modules() -> list:
     from sophie.modules import ALL_MODULES
 
-    load = config.module.load
-    dont_load = config.module.dont_load
+    load = cfg.module.load
+    dont_load = cfg.module.dont_load
 
     if len(load) > 0:
         to_load = load

@@ -23,7 +23,7 @@ import typing
 from motor.motor_asyncio import AsyncIOMotorClient
 from motor_odm import Document
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 
 if typing.TYPE_CHECKING:
     from asyncio import AbstractEventLoop
@@ -31,8 +31,8 @@ if typing.TYPE_CHECKING:
 
 
 def __init_motor__(loop: AbstractEventLoop) -> AgnosticDatabase:
-    motor = AsyncIOMotorClient(config.mongo.url, io_loop=loop)  # type: ignore
-    mongo = motor[config.mongo.namespace]  # type: ignore
+    motor = AsyncIOMotorClient(cfg.mongo.url, io_loop=loop)
+    mongo = motor[cfg.mongo.namespace]
 
     Document.use(mongo)
     return mongo

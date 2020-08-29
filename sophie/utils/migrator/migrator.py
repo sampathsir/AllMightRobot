@@ -23,7 +23,7 @@ from importlib import import_module
 from pathlib import Path
 from typing import Optional, TYPE_CHECKING
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 from sophie.utils.loader import LOADED_COMPONENTS, LOADED_MODULES
 from sophie.utils.logging import log
 from .db import __setup__ as setup_db, get_current_version, set_version
@@ -96,7 +96,7 @@ async def migrate(package: Package, latest_version: int) -> None:
         log.info('...Done')
         return
 
-    if not config.advanced.migrator:
+    if not cfg.advanced.migrator:
         log.warning('Migrator is disabled, skipping...')
         return
 

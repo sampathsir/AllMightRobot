@@ -17,12 +17,12 @@
 
 from aiogram import Bot, Dispatcher, Router
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 from sophie.utils.logging import log
 
 log.debug('Starting Aiogram...')
 
-TOKEN = config.general.token
+TOKEN = cfg.general.token
 bot = Bot(TOKEN, parse_mode="HTML")
 dp = Dispatcher()
 

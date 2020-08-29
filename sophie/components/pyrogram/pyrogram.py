@@ -20,14 +20,14 @@ import logging
 
 from pyrogram import Client
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 from sophie.utils.logging import log
 
-TOKEN = config.general.token
+TOKEN = cfg.general.token
 session_name = TOKEN.split(':')[0]
 
-API_ID = config.component.pyrogram.app_id
-API_HASH = config.component.pyrogram.app_hash
+API_ID = cfg.component.pyrogram.app_id
+API_HASH = cfg.component.pyrogram.app_hash
 
 log.debug('Starting 🔥Pyrogram...')
 

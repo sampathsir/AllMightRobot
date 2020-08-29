@@ -20,7 +20,7 @@ from typing import List
 from babel.core import Locale
 from flag import flag
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 from .loader import LANGUAGES
 
 
@@ -36,7 +36,7 @@ def get_babel(locale_code: str) -> Locale:
 def get_language_name(locale_code: str) -> str:
     babel = get_babel(locale_code)
 
-    if config.component.localization.languages_names_in_english:
+    if cfg.component.localization.languages_names_in_english:
         return babel.english_name
     else:
         return babel.display_name

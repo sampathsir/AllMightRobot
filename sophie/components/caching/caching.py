@@ -23,7 +23,7 @@ import typing
 
 from aiocache import Cache
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 from sophie.utils.logging import log
 
 if typing.TYPE_CHECKING:
@@ -32,7 +32,7 @@ if typing.TYPE_CHECKING:
 
 
 def get_mode() -> Tuple[Any, dict]:
-    conf = config.component.caching.mode.lower()
+    conf = cfg.component.caching.mode.lower()
 
     if conf == 'memory':
         from aiocache import SimpleMemoryCache
@@ -44,14 +44,14 @@ def get_mode() -> Tuple[Any, dict]:
 
         mode = RedisCache
         kwargs = {
-            'endpoint': config.component.caching.url
+            'endpoint': cfg.component.caching.url
         }
     elif conf == 'memcached':
         from aiocache import MemcachedCache
 
         mode = MemcachedCache
         kwargs = {
-            'endpoint': config.component.caching.url
+            'endpoint': cfg.component.caching.url
         }
     else:
         raise NotImplementedError
@@ -60,7 +60,7 @@ def get_mode() -> Tuple[Any, dict]:
 
 
 def get_serializer() -> Any:
-    conf = config.component.caching.serializer.lower()
+    conf = cfg.component.caching.serializer.lower()
     if conf == 'pickle':
         from aiocache.serializers import PickleSerializer
 
@@ -76,7 +76,7 @@ def get_serializer() -> Any:
 
 
 def __setup__() -> BaseCache:
-    namespace = config.component.caching.namespace
+    namespace = cfg.component.caching.namespace
 
     mode, kwargs = get_mode()
     serializer = get_serializer()

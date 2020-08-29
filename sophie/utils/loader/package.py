@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Any, Optional, Type, cast, Dict
 
 from sophie.utils.bases import Base, BaseModule
-from sophie.utils.config import config, real_config
+from sophie.utils.config import cfg, real_config
 from sophie.utils.logging import log
 from .requirements import check_requirements
 
@@ -72,7 +72,7 @@ class Package:
         log.debug(f"Loading configurations for {self.name} package")
         setattr(
             getattr(
-                config,
+                cfg,
                 self.type
             ),
             self.name,

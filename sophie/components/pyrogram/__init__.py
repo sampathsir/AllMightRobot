@@ -22,8 +22,8 @@ from sophie.utils.bases import BaseComponent
 from .config import __config__
 
 if typing.TYPE_CHECKING:
-    from .pyrogram import pbot as pyrogram
-    pbot: pyrogram
+    from pyrogram import Client
+    pbot: Client
 
 
 class Component(BaseComponent):

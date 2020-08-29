@@ -20,7 +20,7 @@ from __future__ import annotations
 import typing
 
 from sophie.components.caching.cached import cached
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 from .db.locale import get_lang, set_lang
 
 if typing.TYPE_CHECKING:
@@ -31,7 +31,7 @@ if typing.TYPE_CHECKING:
 async def get_chat_locale(chat_id: int) -> str:
     lang = await get_lang(chat_id)
     if not lang:
-        return config.component.localization.default_language
+        return cfg.component.localization.default_language
 
     return lang.locale_code
 
