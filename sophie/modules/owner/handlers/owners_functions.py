@@ -29,8 +29,7 @@ if typing.TYPE_CHECKING:
 
 class OwnersFunctions:
     async def __setup__(self, router: Router) -> None:
-        # self.echo.only_owner = True
-        pass
+        self.term.only_owner = True
 
     @staticmethod
     async def stats(message: Message) -> typing.Any:
