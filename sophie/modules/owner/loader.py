@@ -45,7 +45,7 @@ async def __setup__(router: Router) -> Any:
                 filters = {}
 
                 # Check if function is owner-only
-                if hasattr(func, 'only_owner') and func['only_owner'] is True:
+                if hasattr(func, 'only_owner') and func.only_owner is True:
                     filters['is_owner'] = True
                 else:
                     filters['is_op'] = True
