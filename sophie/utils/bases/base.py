@@ -32,11 +32,9 @@ if TYPE_CHECKING:
 class Base(ABC):
     # these maybe populated or maybe not
     if TYPE_CHECKING:
-        translations: Dict[str, Dict[str, str]]
         configurations: Type[BaseModel]
         __pre_init__: Callable[[ModuleType], Any]
         __before_serving__: Callable[..., Any]
-        __stats__: Callable[[FormatListText], Any]
 
     async def __setup__(*args: Any, **kwargs: Any) -> None:
         pass

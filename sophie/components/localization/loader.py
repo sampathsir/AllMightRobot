@@ -42,12 +42,12 @@ def load_all_languages() -> None:
                 lang = yaml.load(f, Loader=yaml.SafeLoader)
 
                 if not hasattr(module.base, 'translations'):
-                    module.base.translations = {}
+                    module.data['translations'] = {}
 
                 if lang_name not in LANGUAGES:
                     LANGUAGES.append(lang_name)
 
-                module.base.translations[lang_name] = lang
+                module.data['translations'][lang_name] = lang
 
 
 def __setup__() -> Any:

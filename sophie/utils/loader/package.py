@@ -20,7 +20,7 @@ import inspect
 
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Optional, Type, cast
+from typing import Any, Optional, Type, cast, Dict
 
 from sophie.utils.bases import Base, BaseModule
 from sophie.utils.config import config, real_config
@@ -29,6 +29,7 @@ from .requirements import check_requirements
 
 
 class Package:
+    data: Dict[Any, Any] = {}
     version: Optional[str] = None
 
     def __init__(self, type: str, name: str, path: Path):  # noqa: A002

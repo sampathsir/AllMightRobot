@@ -44,8 +44,8 @@ class OwnersFunctions:
         }, title='Stats')
 
         for module in LOADED_MODULES.values():
-            if hasattr(module.base, '__stats__'):
-                text_list = module.base.__stats__(text_list)
+            if 'stats' in module.data:
+                text_list = module.data['stats'](text_list)
 
         await message.reply(text_list.text)
 
