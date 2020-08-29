@@ -72,8 +72,11 @@ def set_latest_version(package: Package) -> Optional[int]:
 
 async def set_current_version(package: Package) -> Optional[int]:
     current_version = await get_current_version(package.name, package.type)
-    typed_loaded[package.type][package.name].p_object.current_db_version = current_version
-    return current_version
+    if current_version:
+        typed_loaded[package.type][package.name].data['current_db_version'] = current_version
+        return current_version
+
+    return None
 
 
 async def migrate(loaded: Package, latest_version: int) -> None:

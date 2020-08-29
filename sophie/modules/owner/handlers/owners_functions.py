@@ -58,7 +58,7 @@ class OwnersFunctions:
             args = {'ver': module.version}
 
             # Show database version. Reference to /sophie/utils/migrator.py
-            if hasattr(module.p_object, 'current_db_version'):
+            if 'current_db_version' in module.data:
                 args['db'] = module.p_object.current_db_version
 
             data.append((module.name, args))
