@@ -56,8 +56,8 @@ class MigrationDB(Document):
         use_enum_values = True
 
 
-async def get_current_version(loaded_name: str, loaded_type: str) -> Optional[int]:
-    data = await MigrationDB.find_one({"name": loaded_name, "type": loaded_type})
+async def get_current_version(package_name: str, package_type: str) -> Optional[int]:
+    data = await MigrationDB.find_one({"name": package_name, "type": package_type})
 
     if not data:
         return None
@@ -80,4 +80,4 @@ async def __setup__() -> Any:
         await mongo.create_collection(col_name)
 
     log.debug(f'Creating indexes for "{col_name}" column')
-    await MigrationDB.init_indexes()
+    # await MigrationDB.init_indexes()

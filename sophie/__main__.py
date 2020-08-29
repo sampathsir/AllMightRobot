@@ -21,11 +21,11 @@ from logging import DEBUG
 from sophie.services.aiogram import dp, bot
 from sophie.services.mongo import __setup__ as init_mongo
 from sophie.utils.logging import log
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 
 from sophie.utils.loader import load_all
 
-if config.advanced.debug:
+if cfg.advanced.debug:
     log.setLevel(DEBUG)
     log.warning("! Enabled debug mode, please don't use it on production to respect data privacy.")
 
@@ -38,7 +38,7 @@ log.debug("...Done")
 
 load_all(loop)
 
-if config.advanced.migrator:
+if cfg.advanced.migrator:
     from sophie.utils.migrator.migrator import __setup__ as migrator
 
     log.info("Checking database migration status...")

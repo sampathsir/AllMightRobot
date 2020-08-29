@@ -1,4 +1,5 @@
 # Copyright (C) 2018 - 2020 MrYacha.
+# Copyright (C) 2020 Jeepeo.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,16 +16,17 @@
 #
 # This file is part of Sophie.
 
-from aiogram import Bot, Dispatcher, Router
+from __future__ import annotations
 
-from sophie.utils.config import cfg
-from sophie.utils.logging import log
+from abc import ABC
+from typing import List, Optional, TYPE_CHECKING, Union
 
-log.debug('Starting Aiogram...')
+from .base import Base
 
-TOKEN = cfg.general.token
-bot = Bot(TOKEN, parse_mode="HTML")
-dp = Dispatcher()
+if TYPE_CHECKING:
+    from aiogram import Router
 
-modules_router = Router()
-dp.include_router(modules_router)
+
+class BaseModule(Base, ABC):
+    router: Optional[Union[List[Router], Router]]
+    """Registered router(s) for the module"""

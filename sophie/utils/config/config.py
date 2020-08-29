@@ -42,6 +42,6 @@ class Conf(BaseSettings):
 with open('config/config.json') as f:
     real_config = json.load(f)
 
-config = Conf.parse_obj(real_config)
+cfg = Conf.parse_obj(real_config)
 
-__all__ = ["config"]
+__all__ = ["cfg"]

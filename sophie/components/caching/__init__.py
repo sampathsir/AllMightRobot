@@ -17,14 +17,19 @@
 # This file is part of Sophie.
 
 import typing
+
+from sophie.utils.bases import BaseComponent
 from .config import __config__
 
+if typing.TYPE_CHECKING:
+    from aiocache.base import BaseCache
+    cache: BaseCache
 
-def __pre_init__(self) -> typing.Any:
-    from .caching import __setup__ as caching
-    self.p_object.cache = caching()
 
+class Component(BaseComponent):
+    configurations = __config__
 
-__all__ = [
-    '__config__'
-]
+    @classmethod
+    def __pre_init__(cls, module: typing.Any) -> typing.Any:
+        from .caching import __setup__ as caching
+        module.cache = caching()

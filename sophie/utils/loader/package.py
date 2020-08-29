@@ -16,23 +16,21 @@
 #
 # This file is part of Sophie.
 
+import inspect
+
 from importlib import import_module
 from pathlib import Path
-from typing import List, Union, cast
+from typing import Any, Optional, Type, cast, Dict
 
-from aiogram import Router
-
-from sophie.modules import BaseModule
+from sophie.utils.bases import Base, BaseModule
+from sophie.utils.config import cfg, real_config
 from sophie.utils.logging import log
 from .requirements import check_requirements
 
-from sophie.utils.config import real_config, config
-
 
 class Package:
-    routers: List[Router]
-    p_object: BaseModule
-    version: Union[str, None] = None
+    data: Dict[Any, Any] = {}
+    version: Optional[str] = None
 
     def __init__(self, type: str, name: str, path: Path):  # noqa: A002
         self.type = type
@@ -52,40 +50,72 @@ class Package:
                 log.debug("...Done!")
 
         log.debug(f"Importing {self.name} package...")
-        self.p_object: BaseModule = cast(BaseModule, import_module(self.python_path))
+        self.p_object: Any = import_module(self.python_path)  # contains the module
+        self.base = self.__get_member()  # contains base class
 
         version_file = self.path / 'version.txt'
         if version_file.exists():
             with open(version_file) as f:
                 self.version = f.read()
 
-        if hasattr(self.p_object, '__config__'):
-            log.debug(f"Setting config for {self.name} package")
-            setattr(getattr(config, self.type), self.name, self.p_object.__config__().parse_obj(
-                real_config[self.type][self.name] if self.name in real_config[self.type] else {}
-            ))
+        if hasattr(self.base, 'configurations'):
+            self.__load_config()
 
-        if hasattr(self.p_object, '__pre_init__'):
+        if hasattr(self.base, '__pre_init__'):
             log.debug(f"Running __pre_init__ of {self.name} package...")
-            self.p_object.__pre_init__(self)
+            self.__trigger_pre_init()
             log.debug("...Done")
-
-        if self.type == 'module':
-            self._load_module()
 
         log.debug("...Done!")
 
-    def _load_module(self) -> None:
+    def __load_config(self) -> bool:
+        log.debug(f"Loading configurations for {self.name} package")
+        setattr(
+            getattr(
+                cfg,
+                self.type
+            ),
+            self.name,
+            self.base.configurations.parse_obj(
+                real_config.get(self.type, {}).get(self.name, {})
+            )
+        )
+        return True
+
+    def __trigger_pre_init(self) -> Any:
+        log.debug(f"Running __pre_init__ of {self.name} package...")
+        self.base.__pre_init__(self.p_object)
+        log.debug("...Done")
+
+    def __get_member(self) -> Type[Base]:
+        for cls in inspect.getmembers(self.p_object, self.__istarget):
+            return cls[1]
+        else:
+            raise RuntimeError(f"{self.type} {self.name} should implement base!")
+
+    @staticmethod
+    def __istarget(member: Any) -> bool:
+        if inspect.isclass(member) and issubclass(member, Base):
+            if member.__name__ not in {'BaseModule', 'BaseComponent'}:
+                return True
+        return False
+
+
+class Module(Package):
+
+    def __init__(self, type: str, name: str, path: Path):  # noqa: A002
+        super().__init__(type, name, path)
+        if type == 'module':
+            self._load_module(cast(BaseModule, self.base))
+
+    def _load_module(self, module: BaseModule) -> None:
         from sophie.services.aiogram import modules_router
-
-        self.module = self.p_object
-
         # Load routers
-        if self.module.router:
+        if module.router:
 
             log.debug(f"Loading router(s) for {self.name} {self.type}...")
-            if not isinstance(self.module.router, list):
-                self.routers = [self.module.router]
+            if not isinstance(module.router, list):
+                self.routers = [module.router]
             self.routers = self.routers
 
             # Include routers

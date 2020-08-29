@@ -41,13 +41,13 @@ def load_all_languages() -> None:
             with open(f"{path}/{file_name}") as f:
                 lang = yaml.load(f, Loader=yaml.SafeLoader)
 
-                if not hasattr(module.p_object, 'translations'):
-                    module.p_object.translations = {}
+                if not hasattr(module.base, 'translations'):
+                    module.data['translations'] = {}
 
                 if lang_name not in LANGUAGES:
                     LANGUAGES.append(lang_name)
 
-                module.p_object.translations[lang_name] = lang
+                module.data['translations'][lang_name] = lang
 
 
 def __setup__() -> Any:

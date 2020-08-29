@@ -21,14 +21,14 @@ from aiogram import Router
 from aiogram.api.types import Message
 from aiogram.dispatcher.filters import BaseFilter
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 
 
 class IsOwner(BaseFilter):
     is_owner: str
 
     async def __call__(self, message: Message) -> bool:
-        owner_id = config.general.owner_id
+        owner_id = cfg.general.owner_id
         if message.from_user:
             if message.from_user.id != owner_id:
                 return False
@@ -40,8 +40,8 @@ class IsOP(BaseFilter):
     is_op: str
 
     async def __call__(self, message: Message) -> bool:
-        owner_id = config.general.owner_id
-        operators = config.general.operators
+        owner_id = cfg.general.owner_id
+        operators = cfg.general.operators
 
         operators.append(owner_id)
         if message.from_user:

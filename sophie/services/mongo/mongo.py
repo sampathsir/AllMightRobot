@@ -21,10 +21,10 @@ from __future__ import annotations
 import typing
 
 from pymongo import MongoClient
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 
 if typing.TYPE_CHECKING:
     from pymongo.database import Database
 
-mongo_client = MongoClient(config.mongo.url)
-sync_mongo: Database = mongo_client[config.mongo.namespace]
+mongo_client = MongoClient(cfg.mongo.url)
+sync_mongo: Database = mongo_client[cfg.mongo.namespace]

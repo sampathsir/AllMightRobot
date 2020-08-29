@@ -29,8 +29,7 @@ if typing.TYPE_CHECKING:
 
 class OwnersFunctions:
     async def __setup__(self, router: Router) -> None:
-        # self.echo.only_owner = True
-        pass
+        self.term.only_owner = True
 
     @staticmethod
     async def stats(message: Message) -> typing.Any:
@@ -44,8 +43,8 @@ class OwnersFunctions:
         }, title='Stats')
 
         for module in LOADED_MODULES.values():
-            if hasattr(module.p_object, '__stats__'):
-                text_list = module.p_object.__stats__(text_list)
+            if 'stats' in module.data:
+                text_list = module.data['stats'](text_list)
 
         await message.reply(text_list.text)
 
@@ -58,8 +57,8 @@ class OwnersFunctions:
             args = {'ver': module.version}
 
             # Show database version. Reference to /sophie/utils/migrator.py
-            if hasattr(module, 'current_db_version'):
-                args['db'] = module.current_db_version
+            if 'current_db_version' in module.data:
+                args['db'] = module.p_object.current_db_version
 
             data.append((module.name, args))
 

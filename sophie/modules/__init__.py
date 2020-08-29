@@ -16,24 +16,7 @@
 # This file is part of Sophie.
 
 import os
-from typing import Any, List, Union, Optional
-
-from aiogram import Router
-
 from sophie.utils.logging import log
-
-
-class BaseModule:
-    router: Optional[Union[List[Router], Router]]
-    p_object: object
-    """Registered router(s) for the module"""
-
-    async def __setup__(*args: Any, **kwargs: Any) -> None:
-        pass
-
-
-def get_registered_modules() -> List:
-    return BaseModule.__subclasses__()
 
 
 def list_all_modules() -> list:

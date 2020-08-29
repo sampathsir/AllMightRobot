@@ -41,18 +41,18 @@ async def __setup__(router: Router) -> Any:
             functions = [f for f in dir(class_object) if not f.startswith('_')]
             for function in functions:
                 # log.debug(f"Loading {function} under {module['name']} module...")
-                module = getattr(class_object, function)
+                func: Any = getattr(class_object, function)
                 filters = {}
 
                 # Check if function is owner-only
-                if hasattr(module, 'only_owner') and module.only_owner is True:
+                if hasattr(func, 'only_owner') and func.only_owner is True:
                     filters['is_owner'] = True
                 else:
                     filters['is_op'] = True
 
                 filters['op_cmd'] = function  # type: ignore
 
-                router.message.register(module, **filters)  # type: ignore
+                router.message.register(func, **filters)  # type: ignore
                 log.debug('..Done')
         else:
             log.debug(f"Not found owners function for {module.name} module, skipping...")

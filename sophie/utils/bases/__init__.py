@@ -1,4 +1,5 @@
 # Copyright (C) 2018 - 2020 MrYacha.
+# Copyright (C) 2020 Jeepeo.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,16 +16,6 @@
 #
 # This file is part of Sophie.
 
-from aiogram import Bot, Dispatcher, Router
-
-from sophie.utils.config import cfg
-from sophie.utils.logging import log
-
-log.debug('Starting Aiogram...')
-
-TOKEN = cfg.general.token
-bot = Bot(TOKEN, parse_mode="HTML")
-dp = Dispatcher()
-
-modules_router = Router()
-dp.include_router(modules_router)
+from .base import Base
+from .components import BaseComponent
+from .modules import BaseModule

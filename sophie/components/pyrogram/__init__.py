@@ -17,14 +17,20 @@
 # This file is part of Sophie.
 
 import typing
+
+from sophie.utils.bases import BaseComponent
 from .config import __config__
 
+if typing.TYPE_CHECKING:
+    from pyrogram import Client
+    pbot: Client
 
-def __pre_init__(self) -> typing.Any:
-    from .pyrogram import pbot
-    self.object.pbot = pbot
 
+class Component(BaseComponent):
+    configurations = __config__
 
-__all__ = [
-    '__config__'
-]
+    @classmethod
+    def __pre_init__(cls, module: typing.Any) -> typing.Any:
+        from .pyrogram import pbot
+
+        module.pbot = pbot

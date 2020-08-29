@@ -23,7 +23,7 @@ from typing import Any
 
 from loguru import logger
 
-from sophie.utils.config import config
+from sophie.utils.config import cfg
 
 
 class InterceptHandler(logging.Handler):
@@ -46,6 +46,6 @@ class InterceptHandler(logging.Handler):
 logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO)
 log = logging.getLogger(__name__)
 
-if config.advanced.log_file:
+if cfg.advanced.log_file:
     logger.add("logs/sophie.log", rotation="1 d", compression="tar.xz", backtrace=True, diagnose=True, level="INFO")
     log.info("Enabled logging intro sophie.log file.")
