@@ -18,7 +18,7 @@
 import typing
 
 from aiogram import Router
-from sophie.modules import BaseModule
+from sophie.utils.bases import BaseModule
 
 router = Router()
 
@@ -26,8 +26,7 @@ router = Router()
 class Module(BaseModule):
     router = router
 
+    async def __setup__(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+        from .handlers import __setup__ as handlers
 
-async def __setup__(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
-    from .handlers import __setup__ as handlers
-
-    handlers()
+        handlers()

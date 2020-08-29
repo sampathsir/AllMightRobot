@@ -22,7 +22,7 @@ from pathlib import Path
 
 from sophie.utils.config import config
 from sophie.utils.logging import log
-from .package import Package
+from .package import Module
 
 
 def load_modules(to_load: List[str]) -> list:
@@ -30,7 +30,7 @@ def load_modules(to_load: List[str]) -> list:
 
     modules: list = []
     for module_name in to_load:
-        module = Package(
+        module = Module(
             type='module',
             name=module_name,
             path=Path(f"sophie/modules/{module_name}")

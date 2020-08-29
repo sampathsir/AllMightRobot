@@ -1,5 +1,5 @@
 # Copyright (C) 2018 - 2020 MrYacha.
-# Copyright (C) 2020 Jeepeo
+# Copyright (C) 2020 Jeepeo.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,21 +16,12 @@
 #
 # This file is part of Sophie.
 
-import typing
+from abc import ABC
 
-from sophie.utils.bases import BaseComponent
-from .config import __config__
-
-if typing.TYPE_CHECKING:
-    from .pyrogram import pbot as pyrogram
-    pbot: pyrogram
+from .base import Base
 
 
-class Component(BaseComponent):
-    configurations = __config__
-
-    @classmethod
-    def __pre_init__(cls, module: typing.Any) -> typing.Any:
-        from .pyrogram import pbot
-
-        module.pbot = pbot
+class BaseComponent(Base, ABC):
+    """
+    Base for creating components
+    """

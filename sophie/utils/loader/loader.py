@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from typing import ValuesView, Any, TYPE_CHECKING
+from typing import Any, List, TYPE_CHECKING
 
 from sophie.modules.utils.filters import __setup__ as filters_setup
 from sophie.modules.utils.middlewares import __setup__ as middlewares_setup
@@ -27,34 +27,35 @@ from .modules import load_all_modules
 
 if TYPE_CHECKING:
     from .package import Package
+    from asyncio import AbstractEventLoop
 
 
-async def before_srv_task(packages: ValuesView[Package]) -> Any:
-    for package in [m for m in packages if hasattr(m.p_object, '__setup__')]:
+async def before_srv_task(packages: List[Package]) -> Any:
+    for package in [m for m in packages if hasattr(m.base, '__setup__')]:
         log.debug(f"Running __setup__ for: {package.name}")
-        await package.p_object.__setup__()
+        await package.base.__setup__()
 
-    for package in [m for m in packages if hasattr(m.p_object, '__before_serving__')]:
+    for package in [m for m in packages if hasattr(m.base, '__before_serving__')]:
         log.debug(f"Running __before_serving__ for: {package.name}")
-        await package.p_object.__before_serving__()
+        await package.base.__before_serving__()
 
 
-def post_init(loop) -> Any:
+def post_init(loop: AbstractEventLoop) -> Any:
     from . import LOADED_MODULES
     from . import LOADED_COMPONENTS
 
     # Run before_srv_task for components
     log.debug("Running before_srv_task for components...")
-    loop.run_until_complete(before_srv_task(LOADED_COMPONENTS.values()))
+    loop.run_until_complete(before_srv_task(list(LOADED_COMPONENTS.values())))
     log.debug("...Done!")
 
     # Run before_srv_task for modules
     log.debug("Running before_srv_task for modules...")
-    loop.run_until_complete(before_srv_task(LOADED_MODULES.values()))
+    loop.run_until_complete(before_srv_task(list(LOADED_MODULES.values())))
     log.debug("...Done!")
 
 
-def load_all(loop) -> None:
+def load_all(loop: AbstractEventLoop) -> None:
     log.debug('Loading top-level custom filters...')
     filters_setup()
     log.debug('...Done!')

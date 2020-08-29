@@ -1,5 +1,5 @@
 # Copyright (C) 2018 - 2020 MrYacha.
-# Copyright (C) 2020 Jeepeo
+# Copyright (C) 2020 Jeepeo.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,21 +16,27 @@
 #
 # This file is part of Sophie.
 
-import typing
+from __future__ import annotations
 
-from sophie.utils.bases import BaseComponent
-from .config import __config__
-
-if typing.TYPE_CHECKING:
-    from .pyrogram import pbot as pyrogram
-    pbot: pyrogram
+from abc import ABC
+from typing import Callable, Type, Dict, Any, TYPE_CHECKING
 
 
-class Component(BaseComponent):
-    configurations = __config__
+if TYPE_CHECKING:
+    from sophie.modules.utils.text import FormatListText
 
-    @classmethod
-    def __pre_init__(cls, module: typing.Any) -> typing.Any:
-        from .pyrogram import pbot
+    from pydantic import BaseModel
+    from types import ModuleType
 
-        module.pbot = pbot
+
+class Base(ABC):
+    # these maybe populated or maybe not
+    if TYPE_CHECKING:
+        translations: Dict[str, Dict[str, str]]
+        configurations: Type[BaseModel]
+        __pre_init__: Callable[[ModuleType], Any]
+        __before_serving__: Callable[..., Any]
+        __stats__: Callable[[FormatListText], Any]
+
+    async def __setup__(*args: Any, **kwargs: Any) -> None:
+        pass

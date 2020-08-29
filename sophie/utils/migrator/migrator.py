@@ -20,15 +20,16 @@ from __future__ import annotations
 import os
 
 from importlib import import_module
-from typing import Any, Optional, TYPE_CHECKING
+from pathlib import Path
+from typing import Optional, TYPE_CHECKING
 
 from sophie.utils.config import config
-from sophie.utils.loader import LOADED_MODULES, LOADED_COMPONENTS
+from sophie.utils.loader import LOADED_COMPONENTS, LOADED_MODULES
 from sophie.utils.logging import log
 from .db import __setup__ as setup_db, get_current_version, set_version
 
 if TYPE_CHECKING:
-    from asyncio.events import AbstractEventLoop
+    from sophie.utils.loader.package import Package
 
 typed_loaded = {
     'module': LOADED_MODULES,
@@ -42,7 +43,7 @@ async def __setup__() -> None:
 
 
 async def migrate_check() -> None:
-    for package in [*LOADED_MODULES.values(), *LOADED_COMPONENTS.values()]:
+    for package in [*LOADED_MODULES.values(), *LOADED_COMPONENTS.values()]:  # type: Package
         log.debug(f"Running migration check for {package.name} {package.type}...")
         latest_version = set_latest_version(package)
         if latest_version:
@@ -50,10 +51,10 @@ async def migrate_check() -> None:
         await set_current_version(package)
 
 
-def set_latest_version(package: dict) -> Optional[int]:
+def set_latest_version(package: Package) -> Optional[int]:
     if not (package.path / 'migrate').exists():
         log.debug(f"Not found migrate dir for {package.name}, skipping.")
-        return
+        return None
 
     version_file_path = package.path / 'migrate/version.txt'
 
@@ -64,30 +65,31 @@ def set_latest_version(package: dict) -> Optional[int]:
     with open(version_file_path) as f:
         latest_version = int(f.read())
 
-    typed_loaded[package.type][package.name]['latest_db_version'] = latest_version
+    typed_loaded[package.type][package.name].p_object.latest_db_version = latest_version
 
     return latest_version
 
 
-async def set_current_version(package: dict) -> Optional[int]:
+async def set_current_version(package: Package) -> Optional[int]:
     current_version = await get_current_version(package.name, package.type)
-    typed_loaded[package.type][package.name].current_db_version = current_version
+    typed_loaded[package.type][package.name].p_object.current_db_version = current_version
     return current_version
 
 
-async def migrate(loaded: dict, latest_version: int) -> None:
-    current_version = await get_current_version(loaded['name'], loaded['type'])
+async def migrate(loaded: Package, latest_version: int) -> None:
+    current_version = await get_current_version(loaded.name, loaded.type)
     # Check if loaded was never migrated before
     if current_version is None:
-        log.info(f"Database version is not set for {loaded['name']} {loaded['type']}, setting it...")
-        if os.path.exists(loaded['path'] + '/migrate/new.py'):
-            log.debug(f"Running new.py for {loaded['name']} {loaded['type']}...")
-            import_module(loaded['package_path'] + '.migrate.new')
+        log.info(f"Database version is not set for {loaded.name} {loaded.type}, setting it...")
+        if Path(str(loaded.path) + '/migrator/new.py').exists():
+            log.debug(f"Running new.py for {loaded.name} {loaded.type}...")
+            import_module(loaded.python_path + '.migrate.new')
             log.debug('...Done')
         else:
-            log.debug(f"new.py not found for {loaded['name']} {loaded['type']}, skipping.")
+            log.debug(f"new.py not found for {loaded.name} {loaded.type}, skipping.")
 
-        await set_version(loaded['name'], loaded['type'], loaded['latest_db_version'])
+        if loaded.p_object.latest_db_version is not None:
+            await set_version(loaded.name, loaded.type, loaded.p_object.latest_db_version)
         log.info('...Done')
         return
 
@@ -97,11 +99,11 @@ async def migrate(loaded: dict, latest_version: int) -> None:
 
     while current_version < latest_version:
         new_version = current_version + 1
-        log.debug(f"Migrating {loaded['name']} {loaded['type']} to {new_version} version...")
+        log.debug(f"Migrating {loaded.name} {loaded.type} to {new_version} version...")
 
-        package = loaded['package_path'] + f'.migrate.{new_version}'
+        package = loaded.python_path + f'.migrate.{new_version}'
         log.debug(f"Importing {package}...")
         import_module(package)
         log.debug('...Done')
 
-        await set_version(loaded['name'], loaded['type'], new_version)
+        await set_version(loaded.type, loaded.type, new_version)

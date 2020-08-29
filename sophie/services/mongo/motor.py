@@ -31,8 +31,8 @@ if typing.TYPE_CHECKING:
 
 
 def __init_motor__(loop: AbstractEventLoop) -> AgnosticDatabase:
-    motor = AsyncIOMotorClient(config.mongo.url, io_loop=loop)
-    mongo = motor[config.mongo.namespace]
+    motor = AsyncIOMotorClient(config.mongo.url, io_loop=loop)  # type: ignore
+    mongo = motor[config.mongo.namespace]  # type: ignore
 
     Document.use(mongo)
     return mongo

@@ -32,10 +32,10 @@ class GetStrings:
         self.module = module
 
     def get_by_locale_name(self, locale_code: str) -> Dict[str, str]:
-        if locale_code not in self.modules[self.module].p_object.translations:
+        if locale_code not in self.modules[self.module].base.translations:
             locale_code = 'en-US'
 
-        return self.modules[self.module].p_object.translations[locale_code]
+        return self.modules[self.module].base.translations[locale_code]
 
     async def get_by_chat_id(self, chat_id: int) -> Dict[str, str]:
         locale_name = await get_chat_locale(chat_id)

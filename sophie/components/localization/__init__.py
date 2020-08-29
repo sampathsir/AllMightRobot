@@ -15,27 +15,44 @@
 #
 # This file is part of Sophie.
 
-from sophie.utils.logging import log
+from typing import Any, TYPE_CHECKING
 
+from sophie.utils.logging import log
+from sophie.utils.bases import BaseComponent
 
 from .config import __config__
 
+if TYPE_CHECKING:
+    from . import strings
 
-async def __setup__() -> bool:
-    from .loader import __setup__ as load_all_languages
-    from .db import __setup__ as database
-
-    log.debug('Loading localizations...')
-    load_all_languages()
-    log.debug('...Done!')
-
-    log.debug('Loading database...')
-    await database()
-    log.debug('...Done!')
-
-    return True
+    get_string_dec: strings.get_strings_dec  # type: ignore
+    Strings: strings.Strings
+    GetStrings: strings.GetStrings
+    GetString: strings.GetString
 
 
-__all__ = [
-    '__config__'
-]
+class Component(BaseComponent):
+    configurations = __config__
+
+    async def __setup__(*args: Any, **kwargs: Any) -> Any:
+        from .loader import __setup__ as load_all_languages
+        from .db import __setup__ as database
+
+        log.debug('Loading localizations...')
+        load_all_languages()
+        log.debug('...Done!')
+
+        log.debug('Loading database...')
+        await database()
+        log.debug('...Done!')
+
+        return True
+
+    @classmethod
+    def __pre_init__(cls, module: Any) -> Any:
+        from . import strings
+
+        module.get_string_dec = strings.get_strings_dec
+        module.Strings = strings.Strings
+        module.GetStrings = strings.GetStrings
+        module.GetString = strings.GetString

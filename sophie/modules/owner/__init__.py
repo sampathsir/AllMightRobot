@@ -16,11 +16,9 @@
 # This file is part of Sophie.
 
 from typing import Any
-
 from aiogram import Router
 
-from sophie.modules import BaseModule
-
+from sophie.utils.bases import BaseModule
 from .handlers.owners_functions import OwnersFunctions
 
 router = Router()
@@ -29,15 +27,14 @@ router = Router()
 class Module(BaseModule):
     router = router
 
+    async def __setup__(*args: Any, **kwargs: Any) -> Any:
+        from .filters import __setup__ as filters
+        from .handlers import __setup__ as handlers
+        from .loader import __setup__ as loader
 
-async def __setup__(*args: Any, **kwargs: Any) -> Any:
-    from .filters import __setup__ as filters
-    from .handlers import __setup__ as handlers
-    from .loader import __setup__ as loader
-
-    filters(router)
-    handlers()
-    await loader(router)
+        filters(router)
+        handlers()
+        await loader(router)
 
 
 __all__ = [

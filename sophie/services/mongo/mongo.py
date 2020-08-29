@@ -26,5 +26,5 @@ from sophie.utils.config import config
 if typing.TYPE_CHECKING:
     from pymongo.database import Database
 
-mongo_client = MongoClient(config.mongo.url)
-sync_mongo: Database = mongo_client[config.mongo.namespace]
+mongo_client = MongoClient(config.mongo.url)  # type: ignore
+sync_mongo: Database = mongo_client[config.mongo.namespace]  # type: ignore

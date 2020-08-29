@@ -44,8 +44,8 @@ class OwnersFunctions:
         }, title='Stats')
 
         for module in LOADED_MODULES.values():
-            if hasattr(module.p_object, '__stats__'):
-                text_list = module.p_object.__stats__(text_list)
+            if hasattr(module.base, '__stats__'):
+                text_list = module.base.__stats__(text_list)
 
         await message.reply(text_list.text)
 
@@ -58,8 +58,8 @@ class OwnersFunctions:
             args = {'ver': module.version}
 
             # Show database version. Reference to /sophie/utils/migrator.py
-            if hasattr(module, 'current_db_version'):
-                args['db'] = module.current_db_version
+            if hasattr(module.p_object, 'current_db_version'):
+                args['db'] = module.p_object.current_db_version
 
             data.append((module.name, args))
 

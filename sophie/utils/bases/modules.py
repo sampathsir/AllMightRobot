@@ -1,5 +1,5 @@
 # Copyright (C) 2018 - 2020 MrYacha.
-# Copyright (C) 2020 Jeepeo
+# Copyright (C) 2020 Jeepeo.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,21 +16,17 @@
 #
 # This file is part of Sophie.
 
-import typing
+from __future__ import annotations
 
-from sophie.utils.bases import BaseComponent
-from .config import __config__
+from abc import ABC
+from typing import List, Optional, TYPE_CHECKING, Union
 
-if typing.TYPE_CHECKING:
-    from .pyrogram import pbot as pyrogram
-    pbot: pyrogram
+from .base import Base
+
+if TYPE_CHECKING:
+    from aiogram import Router
 
 
-class Component(BaseComponent):
-    configurations = __config__
-
-    @classmethod
-    def __pre_init__(cls, module: typing.Any) -> typing.Any:
-        from .pyrogram import pbot
-
-        module.pbot = pbot
+class BaseModule(Base, ABC):
+    router: Optional[Union[List[Router], Router]]
+    """Registered router(s) for the module"""

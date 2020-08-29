@@ -22,7 +22,7 @@ from typing import Union
 from pathlib import Path
 
 from sophie.utils.logging import log
-from .modules import Package
+from .package import Package
 
 
 def load_component(component_name: str) -> Union[Package, bool]:
