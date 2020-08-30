@@ -19,12 +19,9 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Callable, Type, Dict, Any, TYPE_CHECKING
-
+from typing import Any, Callable, TYPE_CHECKING, Type
 
 if TYPE_CHECKING:
-    from sophie.modules.utils.text import FormatListText
-
     from pydantic import BaseModel
     from types import ModuleType
 

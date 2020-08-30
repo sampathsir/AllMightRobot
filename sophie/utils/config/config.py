@@ -20,14 +20,7 @@
 import json
 
 from pydantic import BaseSettings
-
-from .general import (
-    GeneralConfig,
-    AdvancedConfig,
-    ModuleConfig,
-    ComponentConfig,
-    MongoConfig,
-)
+from .general import AdvancedConfig, ComponentConfig, GeneralConfig, ModuleConfig, MongoConfig
 
 
 class Conf(BaseSettings):
