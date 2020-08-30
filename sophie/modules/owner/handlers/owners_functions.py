@@ -28,8 +28,8 @@ if typing.TYPE_CHECKING:
 
 
 class OwnersFunctions:
-    async def __setup__(self, router: Router) -> None:
-        self.term.only_owner = True
+    async def __setup__(self, _: Router) -> None:
+        self.term.only_owner = True  # type: ignore  # https://github.com/python/mypy/issues/2087
 
     @staticmethod
     async def stats(message: Message) -> typing.Any:
