@@ -18,11 +18,11 @@
 # Basic requrements
 # Per-modules/conponents requrements located inside them
 
-# General
-git+https://github.com/aiogram/aiogram@dev-3.x
-
 # cython for compiling pydantic
 cython
+
+# General
+git+https://github.com/aiogram/aiogram@dev-3.x
 
 # DB
 pymongo
