@@ -19,6 +19,7 @@
 
 import json
 
+from pathlib import Path
 from pydantic import BaseSettings
 from .general import AdvancedConfig, ComponentConfig, GeneralConfig, ModuleConfig, MongoConfig
 
@@ -32,7 +33,7 @@ class Conf(BaseSettings):
     mongo = MongoConfig()
 
 
-with open('config/config.json') as f:
+with open(Path('config/config.json')) as f:
     real_config = json.load(f)
 
 cfg = Conf.parse_obj(real_config)
