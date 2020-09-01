@@ -28,7 +28,7 @@ git+https://github.com/aiogram/aiogram@dev-3.x
 pymongo
 motor
 aiocache
-git+https://github.com/codello/Motor-ODM.git
+git+https://gitlab.com/SophieBot/Motor-ODM.git
 
 pydantic
 
