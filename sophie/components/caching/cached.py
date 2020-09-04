@@ -16,37 +16,70 @@
 #
 # This file is part of Sophie.
 
+from __future__ import annotations
+
 import asyncio
-from functools import wraps
-from typing import Any, TypeVar, Callable, Union, Optional, cast
+import functools
+from typing import Any, Callable, Optional, Union, cast
 
 from sophie.utils.logging import log
 from . import cache
 
-T = TypeVar("T", bound=Callable[..., Any])
 
+class cached:
 
-def cached(ttl: Union[int, float] = None, key: Optional[str] = None, no_self: bool = False) -> Callable[[T], T]:
-    def wrapped(func: T) -> T:
-        @wraps(func)
-        async def wrapped0(*args: Any, **kwargs: Any) -> Any:
-            ordered_kwargs = sorted(kwargs.items())
+    def __init__(self, ttl: Optional[Union[int, float]] = None, key: Optional[str] = None, no_self: bool = False):
+        self.ttl = ttl
+        self.key = key
+        self.no_self = no_self
 
-            new_key = key if key else (func.__module__ or "") + func.__name__
-            new_key += str(args[1:] if no_self else args)
+    def __call__(self, *args: Any, **kwargs: Any) -> Callable[..., Any]:
+        if not hasattr(self, 'func'):
+            self.func: Callable[..., Any] = args[0]
+            # wrap
+            functools.update_wrapper(self, self.func)
+            # return ``cached`` object when function is not being called
+            return self
+        return cast(Callable[..., Any], self._set(*args, **kwargs))
 
-            if ordered_kwargs:
-                new_key += str(ordered_kwargs)
+    async def _set(self, *args: dict, **kwargs: dict) -> Any:
+        key = self.__build_key(*args, **kwargs)
 
-            value = await cache.get(new_key)
-            if value is not None:
-                return value
+        value = await cache.get(key)
+        if value is not None:
+            return value
 
-            result = await func(*args, **kwargs)
-            asyncio.ensure_future(cache.set(new_key, result, ttl=ttl))
-            log.debug(f'Cached: writing new data for key - {new_key}')
-            return result
+        # TODO: ability to cache NoneType returns
+        result = await self.func(*args, **kwargs)
+        asyncio.ensure_future(cache.set(key, result, ttl=self.ttl))
+        log.debug(f'Cached: writing new data for key - {key}')
+        return result
 
-        return cast(T, wrapped0)
+    def __build_key(self, *args: dict, **kwargs: dict) -> str:
+        ordered_kwargs = sorted(kwargs.items())
 
-    return cast(Callable[[T], T], wrapped)
+        new_key = self.key if self.key else (self.func.__module__ or "") + self.func.__name__
+        new_key += str(args[1:] if self.no_self else args)
+
+        if ordered_kwargs:
+            new_key += str(ordered_kwargs)
+
+        return new_key
+
+    async def reset_cache(self, *args: Any, new_value: Any = None, **kwargs: Any) -> Any:
+        """
+        >>> @cached()
+        >>> def somefunction(arg):
+        >>>     pass
+        >>>
+        >>> [...]
+        >>> arg = ... # same thing ^^
+        >>> await somefunction.reset_cache(arg, new_value='Something')
+
+        :param new_value: new/ updated value to be set [optional]
+        """
+
+        key = self.__build_key(*args, **kwargs)
+        if new_value:
+            return await cache.set(key, new_value, ttl=self.ttl)
+        return await cache.delete(key)
