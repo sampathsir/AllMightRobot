@@ -23,7 +23,7 @@ import typing
 
 from contextlib import suppress
 
-from .errors import NoArgsGivenError, MissingField
+from .errors import NoArgsGivenError, MissingField, SkipParsing
 from .fields import Undefined
 
 if typing.TYPE_CHECKING:
@@ -41,7 +41,10 @@ async def _parse(
 
     fields = cls.__fields__
     parsers = cls.__parsers__
+
+    # vars
     values = {}
+    skipped_indexes = 0
     transporter = None  # a medium to allow fields to communicate each other
 
     if not skip_command:
@@ -60,14 +63,28 @@ async def _parse(
         parsed_text = []  # fallback
 
     index = len(parsed_text) - 1
-    for field in cls.__fields__:
-        field_info = fields[field]
+    for field, field_info in fields.items():
 
+        # update skipped indexes
+        if skipped_indexes and isinstance(field_info.index, int):
+            # we dont account slices; as slices is mostly present in last of args?
+            # anyway use case for slices are mostly reasons, nobody places such fields at middle
+            field_info.index = field_info.index - skipped_indexes
         # check the maximum index needed
         if isinstance(field_info.index, int):
-            max_index = field_info.index
+            max_index: typing.Union[int, float] = field_info.index
         elif isinstance(field_info.index, slice):
-            max_index = field_info.index.stop if field_info.index.stop else field_info.index.start
+
+            if field_info.index.stop:
+                max_index = field_info.index.stop
+            elif field_info.index.start:
+                max_index = field_info.index.start
+            else:
+                # look like it need all args
+                max_index = float('-inf')
+                if not parsed_text:
+                    # if text is empty; assign any non-zero +ive integer
+                    max_index = 1
         else:
             max_index = 0
 
@@ -92,19 +109,28 @@ async def _parse(
                 if parser.communicate:
                     args.append(transporter)
 
-                if inspect.iscoroutinefunction(parser.parser):
-                    parsed = await parser.parser(cls, *args)
+                try:
+                    if inspect.iscoroutinefunction(parser.parser):
+                        parsed = await parser.parser(cls, *args)
+                    else:
+                        parsed = parser.parser(cls, *args)
+                except (TypeError, ValueError, AssertionError):
+                    if field_info.default is not Undefined or field_info.allow_none:
+                        value = field_info.default if field_info.default is not Undefined else None  # allow_none
+                        # so next fields index should be reduced
+                        skipped_indexes += 1
+                    else:
+                        # skip parsing
+                        raise SkipParsing
                 else:
-                    parsed = parser.parser(cls, *args)
+                    value = parsed
+                    if isinstance(parsed, tuple) and len(parsed) > 0:
+                        value = parsed[0]  # first item should be the parsed value
+                        with suppress(IndexError):
+                            transporter = parsed[1:]  # rest should be communications
 
-                value = parsed
-                if isinstance(parsed, tuple) and len(parsed) > 0:
-                    value = parsed[0]  # first item should be the parsed value
-                    with suppress(IndexError):
-                        transporter = parsed[1:]  # rest should be communications
-
-                if not value:
-                    raise MissingField(field, field_info)
+                    if not value:
+                        raise MissingField(field, field_info)
 
                 values[field] = value
             else:
