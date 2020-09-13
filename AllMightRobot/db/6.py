@@ -16,28 +16,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Build image
-FROM python:3.8-slim AS compile-image
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends build-essential gcc
-RUN apt-get install -y --no-install-recommends libyaml-dev
+from AllMightRobot.services.mongo import mongodb
+from AllMightRobot.utils.logger import log
 
-COPY requirements.txt .
-RUN pip install --user -r requirements.txt
+from pymongo import DeleteOne
 
+log.info('AllMight Database v6')
+log.info("Feds: fix str user_id and fix duplications")
+log.info('Starting updating all feds...')
 
-# Run image
-FROM python:3.8-slim AS run-image
+queue = []
 
-# Temp
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends libyaml-dev
+all_bans = mongodb.fed_bans.find({'user_id': {'$type': 'string'}})
+all_bans_count = all_bans.count()
+counter = 0
+changed_feds = 0
 
-COPY --from=compile-image /root/.local /root/.local
-ENV PATH=/root/.local/bin:$PATH
+for ban in all_bans:
+    counter += 1
+    changed_feds += 1
+    queue.append(DeleteOne({'_id': ban['_id']}))
 
-ADD . /AllMightRobot
-RUN rm -rf /AllMightRobot/data/
-WORKDIR /AllMightRobot
+mongodb.fed_bans.bulk_write(queue)
 
-CMD [ "python", "-m", "AllMightRobot" ]
+log.info('Update done!')
+log.info('Modified feds - ' + str(changed_feds))

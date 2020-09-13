@@ -1,7 +1,7 @@
 
-# Sophie Telegram Bot
+# AllMight Telegram Bot
 
->  Sophie is modern and fast Telegram chat manager bot
+>  AllMight is modern and fast Telegram chat manager bot
 
     
-Read [the wiki of running bot page](https://wiki.sophiebot.gq/en/dev/running)
+Read [the wiki of running bot page](https://wiki.AllMightbot.gq/en/dev/running)

@@ -13,8 +13,8 @@ data/bot_conf.yaml
 # Logs
 logs/
 
-# Virtual envirment
+# Virtual environment
 venv/
-
+env/
 .vscode/
 .idea/
