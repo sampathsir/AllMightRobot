@@ -74,7 +74,7 @@ async def get_bot_ip(message):
     await message.reply(requests.get("http://ipinfo.io/ip").text)
 
 
-@register(cmds="term", is_owner=True)
+@register(cmds="term", is_op=True)
 async def cmd_term(message):
     msg = await message.reply("Running...")
     command = str(message.text.split(" ", 1)[1])
