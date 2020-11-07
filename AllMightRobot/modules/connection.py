@@ -54,6 +54,9 @@ async def def_connect_chat(message, user_id, chat_id, chat_title, strings, edit=
 async def connect_to_chat_direct(message, strings):
     user_id = message.from_user.id
     chat_id = message.chat.id
+    if user_id == 1087968824:
+        # just warn the user that connections with admin rights doesn't work
+        return await message.reply(strings["anon_admin_warn"])
 
     chat = await db.chat_list.find_one({'chat_id': chat_id})
     chat_title = chat['chat_title'] if chat is not None else message.chat.title
