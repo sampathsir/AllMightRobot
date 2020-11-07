@@ -24,8 +24,9 @@ from datetime import datetime
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils import markdown
 from babel.dates import format_date, format_time, format_datetime
-from telethon.errors import (ButtonUrlInvalidError, MessageEmptyError, UserIsBlockedError,
-                             MediaEmptyError, BadRequestError, ChatWriteForbiddenError)
+from telethon.errors import (ButtonUrlInvalidError, MediaCaptionTooLongError, MessageEmptyError, UserIsBlockedError,
+                        MediaEmptyError, BadRequestError, ChatWriteForbiddenError)
+
 from telethon.tl.custom import Button
 
 import AllMightRobot.modules.utils.tmarkdown as tmarkdown
@@ -243,7 +244,7 @@ async def get_parsed_note_list(message, allow_reply_message=True, split_args=1):
             # Remove cmd and arg from message's text
             text = re.sub(message.get_command() + r"\s?", '', text, 1)
             if split_args > 0:
-                text = re.sub(get_args(message)[0] + r"\s?", '', text, 1)
+                text = re.sub(re.escape(get_args(message)[0]) + r"\s?", '', text, 1)
         # Check on attachment
         if msg_file := await get_msg_file(message):
             note['file'] = msg_file
@@ -312,13 +313,16 @@ async def send_note(send_id, text, **kwargs):
         kwargs['parse_mode'] = tmarkdown
     try:
         return await tbot.send_message(send_id, text, **kwargs)
-    except (ButtonUrlInvalidError, MessageEmptyError, MediaEmptyError, ValueError):
+    except (ButtonUrlInvalidError, MessageEmptyError, MediaEmptyError):
         text = 'I found this note invalid! Please update it (read Wiki).'
         return await tbot.send_message(send_id, text)
+    except MediaCaptionTooLongError:
+        text = textwrap.shorten(text, width=1000)
+        return await tbot.send_message(send_id, text, **kwargs)
     except BadRequestError:  # if reply message deleted
         del kwargs['reply_to']
         return await tbot.send_message(send_id, text, **kwargs)
-    except (ChatWriteForbiddenError, UserIsBlockedError):
+    except (ChatWriteForbiddenError, UserIsBlockedError, ValueError):
         pass
 
 
