@@ -27,7 +27,7 @@ from AllMightRobot.utils.logger import log
 from AllMightRobot.versions import AllMight_VERSION
 
 log.info("----------------------")
-log.info("|      AllMightBot     |")
+log.info("|> AllMightBot @Kaizoku <|")
 log.info("----------------------")
 log.info("Version: " + AllMight_VERSION)
 
