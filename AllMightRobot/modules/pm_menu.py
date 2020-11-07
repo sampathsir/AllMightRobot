@@ -47,7 +47,7 @@ async def start_cmd(message):
 @get_strings_dec('pm_menu')
 async def get_start_func(message, strings, edit=False):
     msg = message.message if hasattr(message, 'message') else message
-    task = msg.edit_text if edit else msg.reply
+    task = msg.edit_text if edit else msg.reply 
     buttons = InlineKeyboardMarkup()
     buttons.add(InlineKeyboardButton(strings['btn_help'], callback_data='get_help'),
                 InlineKeyboardButton(strings['btn_lang'], callback_data='lang_btn'))
