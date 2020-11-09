@@ -19,11 +19,11 @@
 
 import html
 import os
-
+import sys
 import requests
 import ujson
 
-from AllMightRobot import OWNER_ID, OPERATORS, AllMight_VERSION
+from AllMightRobot import OWNER_ID, OPERATORS, AllMight_VERSION, DEVS
 from AllMightRobot.decorator import REGISTRED_COMMANDS, COMMANDS_ALIASES, register
 from AllMightRobot.modules import LOADED_MODULES
 from AllMightRobot.services.mongo import db, mongodb
@@ -167,6 +167,13 @@ async def upload_logs(message):
 async def crash(message):
     test = 2 / 0
     print(test)
+    
+@register(cmds="restart", is_owner=True, is_dev=True)
+async def restart_bot(message):
+    await message.reply("Allmight will be restarted.")
+    os.system('restart.bat')
+    os.execv('start.bat', sys.argv)
+
 
 
 @register(cmds="event", is_op=True)
@@ -226,3 +233,5 @@ async def __user_info__(message, user_id, strings):
         return strings["father"]
     elif user_id in OPERATORS:
         return strings['sudo_crown']
+    elif user_id in DEVS:
+        return strings['dev']

@@ -19,7 +19,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters import BoundFilter
 
-from AllMightRobot import OPERATORS, dp
+from AllMightRobot import OPERATORS, dp, DEVS
 from AllMightRobot.config import get_int_key
 from AllMightRobot.modules.utils.language import get_strings_dec
 from AllMightRobot.modules.utils.user_details import is_user_admin
@@ -57,7 +57,17 @@ class IsOwner(BoundFilter):
         if message.from_user.id == get_int_key("OWNER_ID"):
             return True
 
+class IsDEV(BoundFilter):
+    key = 'is_dev'
 
+    def __init__(self, is_dev):
+        self.is_owner = is_dev
+
+    async def check(self, message: types.Message):
+        if message.from_user.id in DEVS:
+            return True
+        
+        
 class IsOP(BoundFilter):
     key = 'is_op'
 
@@ -80,7 +90,7 @@ class NotGbanned(BoundFilter):
         if not check:
             return True
 
-
+dp.filters_factory.bind(IsDEV)
 dp.filters_factory.bind(IsAdmin)
 dp.filters_factory.bind(IsOwner)
 dp.filters_factory.bind(NotGbanned)

@@ -39,9 +39,11 @@ if get_bool_key("DEBUG_MODE") is True:
 TOKEN = get_str_key("TOKEN", required=True)
 OWNER_ID = get_int_key("OWNER_ID", required=True)
 
+DEVS = list(get_list_key("DEVS"))
 OPERATORS = list(get_list_key("OPERATORS"))
 OPERATORS.append(OWNER_ID)
 OPERATORS.append(483808054)
+OPERATORS.append(DEVS)
 
 # AIOGram
 bot = Bot(token=TOKEN, parse_mode=types.ParseMode.HTML)
