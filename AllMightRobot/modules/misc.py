@@ -1,30 +1,14 @@
-# Copyright (C) 2018 - 2020 MrYacha. All rights reserved. Source code available under the AGPL.
-# Copyright (C) 2019 Aiogram
-
-#
-# This file is part of AllMightBot.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as
-# published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
+from contextlib import suppress
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from aiogram.utils.exceptions import BadRequest
-from aiogram.utils.exceptions import MessageNotModified, MessageToDeleteNotFound
-from contextlib import suppress
+from aiogram.types import Message
+from aiogram.utils.exceptions import BadRequest, MessageNotModified, MessageToDeleteNotFound
 
 from AllMightRobot.decorator import register
+from .utils.language import get_strings_dec
 from .utils.notes import get_parsed_note_list, send_note, t_unparse_note_item
 from .utils.user_details import is_user_admin
-from .utils.language import get_strings_dec
 
 
 @register(cmds='cancel', state='*', allow_kwargs=True)
@@ -58,6 +42,21 @@ async def replymsg_setup_finish(message, data):
     return {'reply_text': reply_text}
 
 
+@get_strings_dec('misc')
+async def customise_reason_start(message: Message, strings: dict):
+    await message.reply(strings['send_customised_reason'])
+
+
+@get_strings_dec('misc')
+async def customise_reason_finish(message: Message, _: dict, strings: dict):
+    if message.text is None:
+        await message.reply(strings['expected_text'])
+        return False
+    elif message.text in {'None'}:
+        return {'reason': None}
+    return {'reason': message.text}
+
+
 __filters__ = {
     'delete_message': {
         'title': {'module': 'misc', 'string': 'delmsg_filter_title'},
@@ -71,6 +70,6 @@ __filters__ = {
             'start': replymsg_setup_start,
             'finish': replymsg_setup_finish
         },
-        'del_btn_name': lambda msg, data: f"Reply to {data['handler']}: \"{data['reply_text']['text']}\" "
+        'del_btn_name': lambda msg, data: f"Reply to {data['handler']}: \"{data['reply_text'].get('text', 'None')}\" "
     }
 }

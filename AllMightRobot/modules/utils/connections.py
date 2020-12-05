@@ -20,7 +20,7 @@ from aiogram.utils.exceptions import Unauthorized
 from AllMightRobot.modules.utils.user_details import is_user_admin
 from AllMightRobot.services.mongo import db
 from AllMightRobot.services.redis import redis
-
+from AllMightRobot.utils.cached import cached
 
 async def get_connected_chat(message, admin=False, only_groups=False, from_id=None, command=None):
     # admin - Require admin rights in connected chat
@@ -43,7 +43,7 @@ async def get_connected_chat(message, admin=False, only_groups=False, from_id=No
         # return cached
 
     # if pm and not connected
-    if not (connected := await db.connections.find_one({'user_id': user_id})) or 'chat_id' not in connected:
+    if not (connected := await get_connection_data(user_id)) or 'chat_id' not in connected:
         if only_groups:
             return {'status': None, 'err_msg': 'usage_only_in_groups'}
         else:
@@ -122,24 +122,32 @@ async def set_connected_chat(user_id, chat_id):
     redis.delete(key)
     if not chat_id:
         await db.connections.update_one({'user_id': user_id}, {"$unset": {'chat_id': 1, 'command': 1}}, upsert=True)
+        await get_connection_data.reset_cache(user_id)
         return
 
-    return await db.connections.update_one(
+    await db.connections.update_one(
         {'user_id': user_id},
         {
             "$set": {'user_id': user_id, 'chat_id': chat_id},
+            "$unset": {'command': 1},
             "$addToSet": {'history': {'$each': [chat_id]}}
         },
         upsert=True
     )
-
+    return await get_connection_data.reset_cache(user_id)
 
 async def set_connected_command(user_id, chat_id, command):
     command.append('disconnect')
-    return await db.connections.update_one(
+    await db.connections.update_one(
         {'user_id': user_id},
         {
             '$set': {'user_id': user_id, 'chat_id': chat_id, 'command': list(command)}
         },
         upsert=True
     )
+    return await get_connection_data.reset_cache(user_id)
+
+
+@cached()
+async def get_connection_data(user_id: int) -> dict:
+    return await db.connections.find_one({'user_id': user_id})

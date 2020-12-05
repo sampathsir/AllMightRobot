@@ -17,15 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from contextlib import suppress
+
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import MessageNotModified
-from contextlib import suppress
 
 from AllMightRobot.decorator import register
 from AllMightRobot.services.mongo import db
-from AllMightRobot.services.quart import quart
-from .utils.api import html_white_text
 from .utils.language import LANGUAGES, get_strings_dec, change_chat_lang, get_chat_lang_info, get_strings
 from .utils.message import get_arg
 
@@ -64,7 +63,7 @@ async def select_lang_keyboard(message, strings, edit=False):
             callback_data=select_lang_cb.new(lang=lang_info['code'], back_btn=False if edit is False else True))
         )
 
-    markup.add(InlineKeyboardButton(strings['crowdin_btn'], url='https://crowdin.com/project/AllMightbot'))
+    markup.add(InlineKeyboardButton(strings['crowdin_btn'], url='https://crowdin.com/project/sophiebot'))
     if edit:
         markup.add(InlineKeyboardButton(strings['back'], callback_data='go_to_start'))
     with suppress(MessageNotModified):
@@ -115,20 +114,6 @@ async def select_lang_callback(query, callback_data=None, **kwargs):
     lang = callback_data['lang']
     back_btn = callback_data['back_btn']
     await change_lang(query.message, lang, e=True, back_btn=back_btn)
-
-
-@quart.route('/wiki/languages_loaded')
-async def languages_loaded_wiki_page():
-    text = "<h2>Loaded languages:</h2>"
-
-    text += '<ul>'
-    for language in LANGUAGES.values():
-        info = language['language_info']
-        text += f"\n<li>{info['flag']} {info['babel'].display_name}</li>"
-
-    text += '</ul>'
-
-    return html_white_text(text)
 
 
 async def __stats__():

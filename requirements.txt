@@ -1,10 +1,11 @@
 # General
-telethon
+#telethon
+telethon~=1.17.0
 aiogram
 
 # DBs
 redis
-aioredis # Redis memery storage fom aiogram
+aioredis # Redis memory storage fom aiogram
 pymongo
 motor
 dnspython # needed to connect to cloud MongoDB instances
@@ -14,18 +15,12 @@ aiohttp[speedups]
 cryptg
 cryptography
 
-# Build uvloop from source, current pip version not compability with python3.8
-#git+https://github.com/python/cpython
-#git+https://github.com/MagicStack/uvloop
-
 # Other
 envparse
 hypercorn
 aiocron
 apscheduler
 requests
-#git+https://github.com/casics/nostril
-quart
 ujson
 PyYAML>5.0
 coloredlogs
@@ -33,3 +28,5 @@ loguru
 sentry_sdk
 babel
 captcha
+async-timeout
+regex

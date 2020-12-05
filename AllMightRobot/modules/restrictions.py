@@ -19,15 +19,16 @@
 
 import asyncio
 import datetime  # noqa: F401
+from contextlib import suppress
 
 from aiogram.utils.exceptions import MessageNotModified
 from babel.dates import format_datetime, format_timedelta
-from contextlib import suppress
 
 from AllMightRobot import BOT_ID, bot
 from AllMightRobot.decorator import register
 from AllMightRobot.services.redis import redis
 from AllMightRobot.services.telethon import tbot
+from .misc import customise_reason_finish, customise_reason_start
 from .utils.connections import chat_connection
 from .utils.language import get_strings_dec
 from .utils.message import InvalidTimeUnit, get_cmd, convert_time
@@ -305,11 +306,11 @@ async def leave_silent(message):
 
 
 @get_strings_dec('restrictions')
-async def filter_handle_ban(message, chat, data, strings=None):
+async def filter_handle_ban(message, chat, data: dict, strings=None):
     if await is_user_admin(chat['chat_id'], message.from_user.id):
         return
     if await ban_user(chat['chat_id'], message.from_user.id):
-        reason = strings['filter_action_rsn']
+        reason = data.get("reason", None) or strings['filter_action_rsn']
         text = strings['filtr_ban_success'] % (await get_user_link(BOT_ID), await get_user_link(message.from_user.id),
                                                reason)
         await bot.send_message(chat['chat_id'], text)
@@ -320,7 +321,7 @@ async def filter_handle_mute(message, chat, data, strings=None):
     if await is_user_admin(chat['chat_id'], message.from_user.id):
         return
     if await mute_user(chat['chat_id'], message.from_user.id):
-        reason = strings['filter_action_rsn']
+        reason = data.get("reason", None) or strings['filter_action_rsn']
         text = strings['filtr_mute_success'] % (await get_user_link(BOT_ID), await get_user_link(message.from_user.id),
                                                 reason)
         await bot.send_message(chat['chat_id'], text)
@@ -331,7 +332,7 @@ async def filter_handle_tmute(message, chat, data, strings=None):
     if await is_user_admin(chat['chat_id'], message.from_user.id):
         return
     if await mute_user(chat['chat_id'], message.from_user.id, until_date=eval(data['time'])):
-        reason = strings['filter_action_rsn']
+        reason = data.get("reason", None) or strings['filter_action_rsn']
         time = format_timedelta(eval(data['time']), locale=strings['language_info']['babel'])
         text = strings['filtr_tmute_success'] % (await get_user_link(BOT_ID), await get_user_link(message.from_user.id),
                                                  time, reason)
@@ -343,7 +344,7 @@ async def filter_handle_tban(message, chat, data, strings=None):
     if await is_user_admin(chat['chat_id'], message.from_user.id):
         return
     if await ban_user(chat['chat_id'], message.from_user.id, until_date=eval(data['time'])):
-        reason = strings['filter_action_rsn']
+        reason = data.get("reason", None) or strings['filter_action_rsn']
         time = format_timedelta(eval(data['time']), locale=strings['language_info']['babel'])
         text = strings['filtr_tban_success'] % (await get_user_link(BOT_ID), await get_user_link(message.from_user.id),
                                                 time, reason)
@@ -382,27 +383,47 @@ async def filter_handle_kick(message, chat, data, strings=None):
 __filters__ = {
     'ban_user': {
         'title': {'module': 'restrictions', 'string': 'filter_title_ban'},
+        'setup': {
+            'start': customise_reason_start,
+            'finish': customise_reason_finish
+        },
         'handle': filter_handle_ban
     },
     'mute_user': {
         'title': {'module': 'restrictions', 'string': 'filter_title_mute'},
+        'setup': {
+            'start': customise_reason_start,
+            'finish': customise_reason_finish
+        },
         'handle': filter_handle_mute
     },
     'tmute_user': {
         'title': {'module': 'restrictions', 'string': 'filter_title_tmute'},
         'handle': filter_handle_tmute,
-        'setup': {
-            'start': time_setup_start,
-            'finish': time_setup_finish
-        }
+        'setup': [
+            {
+                'start': time_setup_start,
+                'finish': time_setup_finish
+            },
+            {
+                'start': customise_reason_start,
+                'finish': customise_reason_finish
+            }
+        ]
     },
     'tban_user': {
         'title': {'module': 'restrictions', 'string': 'filter_title_tban'},
         'handle': filter_handle_tban,
-        'setup': {
-            'start': time_setup_start,
-            'finish': time_setup_finish
-        }
+        'setup': [
+            {
+                'start': time_setup_start,
+                'finish': time_setup_finish
+            },
+            {
+                'start': customise_reason_start,
+                'finish': customise_reason_finish
+            }
+        ]
     },
     'kick_user': {
         'title': {'module': 'restrictions', 'string': 'filter_title_kick'},

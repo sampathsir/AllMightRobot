@@ -19,16 +19,14 @@
 import asyncio
 from importlib import import_module
 
-import hypercorn
+from aiogram import executor
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
 from AllMightRobot import dp
-from AllMightRobot.config import get_bool_key, get_list_key, get_int_key
+from AllMightRobot.config import get_bool_key, get_list_key
 from AllMightRobot.modules import ALL_MODULES, LOADED_MODULES
-from AllMightRobot.services.quart import quart
 from AllMightRobot.utils.logger import log
 
-# import uvloop
 
 if get_bool_key("DEBUG_MODE"):
     log.debug("Enabling logging middleware.")
@@ -54,7 +52,6 @@ if get_bool_key('LOAD_MODULES'):
 else:
     log.warning("Not importing modules!")
 
-# asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 loop = asyncio.get_event_loop()
 
 # Import misc stuff
@@ -69,8 +66,10 @@ async def before_srv_task(loop):
         loop.create_task(module.__before_serving__(loop))
 
 
-@quart.before_serving
-async def startup():
+import_module("AllMightRobot.utils.db_structure_migrator")
+
+
+async def start(_):
     log.debug("Starting before serving task for all modules...")
     loop.create_task(before_srv_task(loop))
 
@@ -78,20 +77,8 @@ async def startup():
         log.debug("Waiting 2 seconds...")
         await asyncio.sleep(2)
 
-    log.info("Aiogram: Using polling method")
-    loop.create_task(dp.start_polling())
-    log.info("Bot is alive!")
-
-
-async def start():
-    log.debug("Running webserver..")
-    config = hypercorn.Config()
-    port = get_int_key('API_PORT')
-    config.bind = [f"localhost:{port}"]
-    await hypercorn.asyncio.serve(quart, config)
-
-
-import_module("AllMightRobot.utils.db_structure_migrator")
 
 log.info("Starting loop..")
-loop.run_until_complete(start())
+log.info("Aiogram: Using polling method")
+
+executor.start_polling(dp, loop=loop, on_startup=start)

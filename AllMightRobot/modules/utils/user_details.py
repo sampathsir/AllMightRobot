@@ -20,7 +20,10 @@
 import pickle
 import re
 from contextlib import suppress
+from typing import Union
 
+from aiogram.dispatcher.handler import SkipHandler
+from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import BadRequest, Unauthorized, ChatNotFound
 from telethon.tl.functions.users import GetFullUserRequest
 
@@ -28,6 +31,7 @@ from AllMightRobot import OPERATORS, bot
 from AllMightRobot.services.mongo import db
 from AllMightRobot.services.redis import bredis
 from AllMightRobot.services.telethon import tbot
+from .language import get_string
 from .message import get_arg
 
 
@@ -141,6 +145,8 @@ async def get_admins_rights(chat_id, force_update=False):
             alist[user_id] = {
                 'status': admin['status'],
                 'admin': True,
+                'title': admin['custom_title'],
+                'anonymous': admin['is_anonymous'],
                 'can_change_info': admin['can_change_info'],
                 'can_delete_messages': admin['can_delete_messages'],
                 'can_invite_users': admin['can_invite_users'],
@@ -164,6 +170,7 @@ async def is_user_admin(chat_id, user_id):
 
     if user_id in OPERATORS:
         return True
+
     # Workaround to support anonymous admins
     if user_id == 1087968824:
         return True
@@ -179,18 +186,29 @@ async def is_user_admin(chat_id, user_id):
             return False
 
 
-async def check_admin_rights(chat_id, user_id, rights):
+async def check_admin_rights(event: Union[Message, CallbackQuery], chat_id, user_id, rights):
     # User's pm should have admin rights
     if chat_id == user_id:
         return True
 
     if user_id in OPERATORS:
         return True
+
     # Workaround to support anonymous admins
-    # TODO: Support for real admins rights check
     if user_id == 1087968824:
+        if not isinstance(event, Message):
+            raise ValueError(f"Cannot extract signuature of anonymous admin from {type(event)}")
+
+        if not event.author_signature:
+            return True
+
+        for admin in (await get_admins_rights(chat_id)).values():
+            if "title" in admin and admin["title"] == event.author_signature:
+                for permission in rights:
+                    if not admin[permission]:
+                        return permission
         return True
-    
+
     admin_rights = await get_admins_rights(chat_id)
     if user_id not in admin_rights:
         return False
@@ -218,8 +236,24 @@ async def check_group_admin(event, user_id, no_msg=False):
         return False
 
 
-async def is_chat_creator(chat_id, user_id):
+async def is_chat_creator(event: Union[Message, CallbackQuery], chat_id, user_id):
     admin_rights = await get_admins_rights(chat_id)
+
+    if user_id == 1087968824:
+        _co, possible_creator = 0, None
+        for admin in admin_rights.values():
+            if admin['title'] == event.author_signature:
+                _co += 1
+                possible_creator = admin
+
+        if _co > 1:
+            await event.answer(await get_string(chat_id, 'global', 'unable_identify_creator'))
+            raise SkipHandler
+
+        if possible_creator['status'] == 'creator':
+            return True
+        return False
+
     if user_id not in admin_rights:
         return False
 
@@ -229,55 +263,95 @@ async def is_chat_creator(chat_id, user_id):
     return False
 
 
-async def get_user_and_text(message, send_text=True, allow_self=False):
+async def get_user_by_text(message, text: str):
+    # Get all entities
+    entities = filter(lambda ent: ent['type'] == 'text_mention' or ent['type'] == 'mention', message.entities)
+    for entity in entities:
+        # If username matches entity's text
+        if text in entity.get_text(message.text):
+            if entity.type == 'mention':
+                # This one entity is comes with mention by username, like @rSophieBot
+                return await get_user_by_username(text)
+            elif entity.type == 'text_mention':
+                # This one is link mention, mostly used for users without an username
+                return await get_user_by_id(entity.user.id)
+
+    # Now let's try get user with user_id
+    # We trying this not first because user link mention also can have numbers
+    if text.isdigit():
+        user_id = int(text)
+        if user := await get_user_by_id(user_id):
+            return user
+
+    # Not found anything 😞
+    return None
+
+
+async def get_user(message, allow_self=False):
     args = message.text.split(None, 2)
     user = None
-    text = None
 
     # Only 1 way
     if len(args) < 2 and "reply_to_message" in message:
+        return await get_user_by_id(message.reply_to_message.from_user.id)
+
+    # Use default function to get user
+    if len(args) > 1:
+        user = await get_user_by_text(message, args[1])
+
+    if not user and bool(message.reply_to_message):
         user = await get_user_by_id(message.reply_to_message.from_user.id)
 
-    # Get all mention entities
-    entities = filter(lambda ent: ent['type'] == 'text_mention' or ent['type'] == 'mention', message.entities)
-    for item in entities:
-        mention = item.get_text(message.text)
+    if not user and allow_self:
+        # TODO: Fetch user from message instead of db?! less overhead
+        return await get_user_by_id(message.from_user.id)
 
-        # Allow get user only in second arg: ex. /warn (user) Reason
-        # so if we write nick in reason and try warn by reply it will work as expected
-        if mention == args[1]:
-            if len(args) > 2:
-                text = args[2]
-            user = await get_user_by_username(mention) if item.type != 'text_mention'\
-                else await get_user_by_id(int(item.user.id))
-            if not user and send_text:
-                await message.answer("I can't get the user!")
-                return None, None
+    # No args and no way to get user
+    if not user and len(args) < 2:
+        return None
 
-    if not user:
-        # Ok, now we really be unsure, so don't return right away
-        if len(args) > 1:
-            if args[1].isdigit():
-                user = await get_user_by_id(int(args[1]))
+    return user
 
-        if len(args) > 2:
-            text = args[2]
 
-        # Not first because ex. admins can /warn (user) and reply to offended user
-        if not user and "reply_to_message" in message:
-            if len(args) > 1:
-                text = message.get_args()
-            return await get_user_by_id(message.reply_to_message.from_user.id), text
+async def get_user_and_text(message, **kwargs):
+    args = message.text.split(' ', 2)
+    user = await get_user(message, **kwargs)
 
-        if not user and allow_self is True:
-            user = await get_user_by_id(message.from_user.id)
+    if len(args) > 1:
+        if (test_user := await get_user_by_text(message, args[1])) == user:
+            if test_user:
+                print(len(args))
+                if len(args) > 2:
+                    return user, args[2]
+                else:
+                    return user, ''
 
-    if not user:
-        if send_text:
-            await message.answer("I can't get the user!")
-        return None, None
+    if len(args) > 1:
+        return user, message.text.split(' ', 1)[1]
+    else:
+        return user, ''
 
-    return user, text
+
+async def get_users(message):
+    args = message.text.split(None, 2)
+    text = args[1]
+    users = []
+
+    for text in text.split('|'):
+        if user := await get_user_by_text(message, text):
+            users.append(user)
+
+    return users
+
+
+async def get_users_and_text(message):
+    users = await get_users(message)
+    args = message.text.split(None, 2)
+
+    if len(args) > 1:
+        return users, args[1]
+    else:
+        return users, ''
 
 
 def get_user_and_text_dec(**dec_kwargs):
@@ -287,7 +361,7 @@ def get_user_and_text_dec(**dec_kwargs):
             if hasattr(message, 'message'):
                 message = message.message
 
-            user, text = await get_user_and_text(message, **dec_kwargs, send_text=False)
+            user, text = await get_user_and_text(message, **dec_kwargs)
             if not user:
                 await message.reply("I can't get the user!")
                 return
@@ -306,8 +380,8 @@ def get_user_dec(**dec_kwargs):
             if hasattr(message, 'message'):
                 message = message.message
 
-            user, text = await get_user_and_text(message, send_text=False, **dec_kwargs)
-            if not user:
+            user, text = await get_user_and_text(message, **dec_kwargs)
+            if not bool(user):
                 await message.reply("I can't get the user!")
                 return
             else:
@@ -357,4 +431,5 @@ def get_chat_dec(allow_self=False, fed=False):
             return await func(*args, chat, **kwargs)
 
         return wrapped_1
+
     return wrapped
