@@ -404,6 +404,9 @@ STRINGS:
     not_in_chat: "Вы больше не в этом чате, я отключу вас."
     u_should_be_admin: "Вы должны быть админом в {}!"
     usage_only_in_groups: "Использование ограничено только в группах!"
+    anon_admin_warn: |
+      You cant connect from chat as long as you are anonymous!
+      try connecting through PM, you wont have admin rights anyway.
   global:
     u_not_admin: Вы должны быть админом, чтобы сделать это!
     #Rights
@@ -414,6 +417,7 @@ STRINGS:
   owner_stuff:
     father: "\nОн мой создатель."
     sudo_crown: "\nО, зырь, у этого юзера на голове корона. Ща посмотрю.... Вау, там гравировка - <b>'sudo user'</b>!"
+    dev: "\nHey! Look, that user has a crown, let me see it... Wow, it has an engraving - <b>'dev user'</b>!"
   stickers:
     rpl_to_sticker: "Ответьте на стикер!"
     ur_sticker: |
