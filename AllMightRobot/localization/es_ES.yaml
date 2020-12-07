@@ -410,6 +410,9 @@ STRINGS:
     not_in_chat: "Ya no estás en este chat. Te desconectaré."
     u_should_be_admin: "¡Debes ser un administrador en {}!"
     usage_only_in_groups: "¡El uso limitado sólo en grupos!"
+    anon_admin_warn: |
+      You cant connect from chat as long as you are anonymous!
+      try connecting through PM, you wont have admin rights anyway.
   global:
     u_not_admin: '¡Deberías ser un administrador para hacer esto!'
     #Rights
@@ -420,6 +423,7 @@ STRINGS:
   owner_stuff:
     father: "\nÉl es mi creador."
     sudo_crown: "\n¡Oye! Mira que el usuario tiene una corona, déjame verla.. Wow, tiene un grabado - <b>'sudo usuario'</b>!"
+    dev: "\nHey! Look, that user has a crown, let me see it... Wow, it has an engraving - <b>'dev user'</b>!"
   stickers:
     rpl_to_sticker: "Responder a un sticker!"
     ur_sticker: |
