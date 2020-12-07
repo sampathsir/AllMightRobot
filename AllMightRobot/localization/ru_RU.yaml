@@ -405,8 +405,8 @@ STRINGS:
     u_should_be_admin: "Вы должны быть админом в {}!"
     usage_only_in_groups: "Использование ограничено только в группах!"
     anon_admin_warn: |
-      You cant connect from chat as long as you are anonymous!
-      try connecting through PM, you wont have admin rights anyway.
+      Вы не можете подключиться из чата до тех пор, как вы анонимны!
+      попробуйте подключиться через PM, вы не будете иметь права администратора в любом случае.
   global:
     u_not_admin: Вы должны быть админом, чтобы сделать это!
     #Rights
@@ -417,7 +417,7 @@ STRINGS:
   owner_stuff:
     father: "\nОн мой создатель."
     sudo_crown: "\nО, зырь, у этого юзера на голове корона. Ща посмотрю.... Вау, там гравировка - <b>'sudo user'</b>!"
-    dev: "\nHey! Look, that user has a crown, let me see it... Wow, it has an engraving - <b>'dev user'</b>!"
+    dev: "\nЭй! Посмотрите, что пользователь имеет корону, позвольте мне увидеть его... Вау, у него есть гравюра - <b>'dev user'</b>!"
   stickers:
     rpl_to_sticker: "Ответьте на стикер!"
     ur_sticker: |
@@ -431,7 +431,7 @@ STRINGS:
     unpin_success: "Успешно откреплено!"
   users:
     user_info: "<b>Информация о пользователе:</b>\n"
-    info_id: "ID: <code>{id}</code>"
+    info_id: "<code>{id}</code>"
     info_first: "\nИмя: {first_name}"
     info_last: "\nФамилия: {last_name}"
     info_username: "\nИмя пользователя: {username}"
