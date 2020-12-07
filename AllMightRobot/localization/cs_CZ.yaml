@@ -136,10 +136,6 @@ STRINGS:
     conn_chat_id: "ID aktuálně připojeného chatu: <code>{id}</code>"
     help_btn: "Klikni na mě pro nápovědu!"
     help_txt: "Pro pomoc klikněte na tlačítko níže!"
-    paste_success_extra: "<b>Úspěšně vloženo!</b>\nZkrácená url: {}\nPůvodní Dogbin URL: {}"
-    paste_success: "<b>Úspěšně vloženo!</b>\nDogbin URL: {}"
-    paste_fail: "Nepodařilo se připojit k Dogbinu!"
-    paste_no_text: "Nedodali jste text pro vložení!"
     delmsg_filter_title: 'Odstraň zprávu'
     send_text: Pošli prosím odpověď!
     replymsg_filter_title: 'Odpověz na zprávu'
@@ -260,6 +256,7 @@ STRINGS:
       <b>sledování zakázáno</b> #LoggingDisabled
       <b>Fed:</b> {fed_name} (<code>{fed_id}</code>)
     #/fchatlist
+    no_chats: "There's no chats joined this <b>{name}</b> Federation"
     chats_in_fed: "<b>Chaty připojené k {name} Federaci:</b>\n"
     too_large: "Výstup je příliš velký, odesílám ho jako soubor"
     #/finfo
@@ -282,7 +279,8 @@ STRINGS:
     update_fban: "Tento uživatel byl již federačně zabanován již předtím a proto aktualizuji důvod banu na <code>{reason}</code>"
     already_fbanned: "{user} je již v této federaci zabanován."
     fbanned_header: "<b>Nový Federační Ban</b>\n"
-    fban_info: '|#ChatLeaved <b>Federace:</b> {fed} <b>Federační admin:</b> {fadmin} <b>Uživatel:</b> {user} (<code>{user_id}</code>)'
+    fban_info: |
+      |#ChatLeaved <b>Federace:</b> {fed} <b>Federační admin:</b> {fadmin} <b>Uživatel:</b> {user} (<code>{user_id}</code>)
     fbanned_reason: "<b>Důvod:</b> <code>{reason}</code>"
     fbanned_process: "\n<b>Stav:</b> Banuji v <code>{num}</code> federačních chatech..."
     fbanned_done: "\n<b>Stav:</b> Hotovo! zabanován v <code>{num}</code> chatech!"
@@ -411,6 +409,9 @@ STRINGS:
     not_in_chat: "Už nejste v tomto chatu, odpojím vás."
     u_should_be_admin: "Měl bys být správcem v {}!"
     usage_only_in_groups: "Použití omezeno pouze ve skupinách!"
+    anon_admin_warn: |
+      You cant connect from chat as long as you are anonymous!
+      try connecting through PM, you wont have admin rights anyway.
   global:
     u_not_admin: Měli byste být admin aby jste to mohl udělat!
     #Rights
@@ -421,6 +422,7 @@ STRINGS:
   owner_stuff:
     father: "\nJe to můj tvůrce."
     sudo_crown: "\nHej! Podívejte, ten uživatel má korunu, nechte mě se podívat... Wow, to bylo úžasné - <b>'sudo user'</b>!"
+    dev: "\nHey! Look, that user has a crown, let me see it... Wow, it has an engraving - <b>'dev user'</b>!"
   stickers:
     rpl_to_sticker: "Odpovězte na nálepku!"
     ur_sticker: |
