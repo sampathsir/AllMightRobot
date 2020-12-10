@@ -97,11 +97,12 @@ async def help_cmd(message, strings):
 
 @register(helpmenu_cb.filter(), f='cb', allow_kwargs=True)
 async def helpmenu_callback(query, callback_data=None, **kwargs):
-    helpmenu_cb
     mod = callback_data['mod']
     if not mod in MOD_HELP:
         await query.answer()
+        return
     msg = f"Help for *{mod}*\n\n"
     msg += f"{MOD_HELP[mod]}"
     with suppress(MessageNotModified):
         await query.message.edit_text(msg)
+        await query.answer('Help for ' + mod)
