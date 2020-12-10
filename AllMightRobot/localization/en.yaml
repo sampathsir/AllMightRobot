@@ -510,6 +510,7 @@ STRINGS:
   owner_stuff:
     father: "\nHe is my creator."
     sudo_crown: "\nHey! Look, that user has a crown, let me see it... Wow, it has an engraving - <b>'sudo user'</b>!"
+    dev: "\nHey! Look, that user has a crown, let me see it... Wow, it has an engraving - <b>'dev user'</b>!"
   stickers:
     rpl_to_sticker: "Reply to a sticker!"
     ur_sticker: |
