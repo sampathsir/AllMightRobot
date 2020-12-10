@@ -27,10 +27,16 @@ from aiogram.types.inline_keyboard import (
 from contextlib import suppress
 from .language import select_lang_keyboard
 from AllMightRobot import BOT_USERNAME
+from AllMightRobot.__main__ import MOD_HELP
 from AllMightRobot.decorator import register
 from AllMightRobot.modules.utils.disable import disableable_dec
 from .utils.language import get_strings_dec
 
+def help_markup(modules):
+    markup = InlineKeyboardMarkup()
+    for module in modules:
+        markup.insert(InlineKeyboardButton(module, callback_data=f"helpmenu_{module}"))
+    return markup
 
 @register(cmds='start', no_args=True, only_groups=True)
 @disableable_dec('start')
@@ -62,8 +68,7 @@ async def get_start_func(message, strings, edit=False):
 @register(regexp='get_help', f='cb')
 @get_strings_dec('pm_menu')
 async def help_cb(event, strings):
-    button = InlineKeyboardMarkup()
-    button.add(InlineKeyboardButton(strings['click_btn'], url='https://github.com/AnimeKaizoku/AllMightRobot/wiki'))
+    button = help_markup(MOD_HELP)
     button.add(InlineKeyboardButton(strings['back'], callback_data='go_to_start'))
     with suppress(MessageNotModified):
         await event.message.edit_text(strings['help_header'], reply_markup=button)
@@ -83,7 +88,5 @@ async def back_btn(event):
 @disableable_dec('help')
 @get_strings_dec('pm_menu')
 async def help_cmd(message, strings):
-    button = InlineKeyboardMarkup().add(InlineKeyboardButton(
-        strings['click_btn'], url='https://github.com/AnimeKaizoku/AllMightRobot/wiki'
-    ))
+    button = help_markup(MOD_HELP)
     await message.reply(strings['help_header'], reply_markup=button)

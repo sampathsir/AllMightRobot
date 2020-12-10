@@ -34,6 +34,7 @@ if get_bool_key("DEBUG_MODE"):
 
 LOAD = get_list_key("LOAD")
 DONT_LOAD = get_list_key("DONT_LOAD")
+MOD_HELP = {}
 
 if get_bool_key('LOAD_MODULES'):
     if len(LOAD) > 0:
@@ -47,6 +48,11 @@ if get_bool_key('LOAD_MODULES'):
     for module_name in modules:
         log.debug(f"Importing <d><n>{module_name}</></>")
         imported_module = import_module("AllMightRobot.modules." + module_name)
+        if hasattr(imported_module, '__help__'):
+            if hasattr(imported_module, '__mod_name__'):
+                MOD_HELP[imported_module.__mod_name__] = imported_module.__help__
+            else:
+                MOD_HELP[imported_module.__name__] = imported_module.__help__
         LOADED_MODULES.append(imported_module)
     log.info("Modules loaded!")
 else:
@@ -55,6 +61,7 @@ else:
 loop = asyncio.get_event_loop()
 
 # Import misc stuff
+import_module('AllMightRobot.modules.pm_menu')
 import_module("AllMightRobot.utils.exit_gracefully")
 if not get_bool_key('DEBUG_MODE'):
     import_module("AllMightRobot.utils.sentry")
