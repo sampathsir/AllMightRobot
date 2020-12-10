@@ -25,18 +25,19 @@ from aiogram.types.inline_keyboard import (
 )
 
 from contextlib import suppress
-from .language import select_lang_keyboard
 from AllMightRobot import BOT_USERNAME
-from AllMightRobot.__main__ import MOD_HELP
 from AllMightRobot.decorator import register
-from AllMightRobot.modules.utils.disable import disableable_dec
+from . import MOD_HELP
+from .utils.disable import disableable_dec
 from .utils.language import get_strings_dec
+from .language import select_lang_keyboard
 
 def help_markup(modules):
     markup = InlineKeyboardMarkup()
     for module in modules:
         markup.insert(InlineKeyboardButton(module, callback_data=f"helpmenu_{module}"))
     return markup
+
 
 @register(cmds='start', no_args=True, only_groups=True)
 @disableable_dec('start')

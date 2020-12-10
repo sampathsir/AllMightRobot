@@ -24,7 +24,7 @@ from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
 from AllMightRobot import dp
 from AllMightRobot.config import get_bool_key, get_list_key
-from AllMightRobot.modules import ALL_MODULES, LOADED_MODULES
+from AllMightRobot.modules import ALL_MODULES, LOADED_MODULES, MOD_HELP
 from AllMightRobot.utils.logger import log
 
 
@@ -34,7 +34,6 @@ if get_bool_key("DEBUG_MODE"):
 
 LOAD = get_list_key("LOAD")
 DONT_LOAD = get_list_key("DONT_LOAD")
-MOD_HELP = {}
 
 if get_bool_key('LOAD_MODULES'):
     if len(LOAD) > 0:
@@ -46,6 +45,9 @@ if get_bool_key('LOAD_MODULES'):
 
     log.info("Modules to load: %s", str(modules))
     for module_name in modules:
+	# Load pm_menu at last
+        if module_name == 'pm_menu':
+            continue
         log.debug(f"Importing <d><n>{module_name}</></>")
         imported_module = import_module("AllMightRobot.modules." + module_name)
         if hasattr(imported_module, '__help__'):
@@ -60,8 +62,9 @@ else:
 
 loop = asyncio.get_event_loop()
 
+import_module("AllMightRobot.modules.pm_menu")
 # Import misc stuff
-import_module('AllMightRobot.modules.pm_menu')
+
 import_module("AllMightRobot.utils.exit_gracefully")
 if not get_bool_key('DEBUG_MODE'):
     import_module("AllMightRobot.utils.sentry")

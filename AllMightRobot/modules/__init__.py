@@ -22,7 +22,7 @@ from AllMightRobot.utils.logger import log
 
 
 LOADED_MODULES = []
-
+MOD_HELP = {}
 
 def list_all_modules() -> list:
     modules_directory = 'AllMightRobot/modules'
@@ -31,7 +31,7 @@ def list_all_modules() -> list:
     for module_name in os.listdir(modules_directory):
         path = modules_directory + '/' + module_name
 
-        if path in ['__init__', '__pycache__', 'pm_menu']:
+        if '__init__' in path or '__pycache__' in path:
             continue
 
         if path in all_modules:
