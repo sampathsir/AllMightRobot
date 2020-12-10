@@ -104,5 +104,5 @@ async def helpmenu_callback(query, callback_data=None, **kwargs):
     msg = f"Help for *{mod}*\n\n"
     msg += f"{MOD_HELP[mod]}"
     with suppress(MessageNotModified):
-        await query.message.edit_text(msg)
+        await query.message.edit_text(msg, parse_mode = 'markdown')
         await query.answer('Help for ' + mod)
