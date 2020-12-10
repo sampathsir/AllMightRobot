@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import MessageNotModified
 from aiogram.types.inline_keyboard import (
     InlineKeyboardMarkup,
@@ -32,10 +33,12 @@ from .utils.disable import disableable_dec
 from .utils.language import get_strings_dec
 from .language import select_lang_keyboard
 
+helpmenu_cb = CallbackData('helpmenu', 'mod')
+
 def help_markup(modules):
     markup = InlineKeyboardMarkup()
     for module in modules:
-        markup.insert(InlineKeyboardButton(module, callback_data=f"helpmenu_{module}"))
+        markup.insert(InlineKeyboardButton(module, callback_data=helpmenu_cb.new(mod = module)))
     return markup
 
 
@@ -91,3 +94,14 @@ async def back_btn(event):
 async def help_cmd(message, strings):
     button = help_markup(MOD_HELP)
     await message.reply(strings['help_header'], reply_markup=button)
+
+@register(helpmenu_cb.filter(), f='cb', allow_kwargs=True)
+async def helpmenu_callback(query, callback_data=None, **kwargs):
+    helpmenu_cb
+    mod = callback_data['mod']
+    if not mod in MOD_HELP:
+        await query.answer()
+    msg = f"Help for *{mod}*\n\n"
+    msg += f"{MOD_HELP[mod]}"
+    with suppress(MessageNotModified):
+        await query.message.edit_text(msg)
