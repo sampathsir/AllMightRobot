@@ -41,9 +41,9 @@ STRINGS:
       <b>Pattern:</b> <code>{request}</code>
       <b>Matched notes:</b>
     #/noteinfo
-    note_info_title: "<b>Note info</b>\n"
-    note_info_note: "Note names: %s\n"
-    note_info_content: "Note content: %s\n"
+    note_info_title: "<b>פרטי קיצור</b>\n"
+    note_info_note: "שם קיצור: %s\n"
+    note_info_content: "תוכן הקיצור: %s\n"
     note_info_parsing: "Parse mode: <code>%s</code>\n"
     note_info_created: "Was created in: <code>{date}</code> by {user}\n"
     note_info_updated: "Last updated in: <code>{date}</code> by {user}\n"
@@ -90,7 +90,7 @@ STRINGS:
     warn: "{admin} has warned {user} in <b>{chat_name}</b>\n"
     warn_bun: "Warnings has been exceeded! {user} has been banned!"
     warn_num: "Warns: {curr_warns}/{max_warns}\n"
-    warn_rsn: "Reason: <code>{reason}</code>\n"
+    warn_rsn: "סיבה: <code>{reason}</code>\n"
     max_warn_exceeded: Warnings has been exceeded! %s has been %s!
     "max_warn_exceeded:tmute": Warnings has been exceeded! %s has been tmuted for %s!
     #warn rmv callback
@@ -134,7 +134,7 @@ STRINGS:
     chat_id: "Group ID: <code>{id}</code>\n"
     user_id: "{user}'s ID: <code>{id}</code>\n"
     conn_chat_id: "Current connected chat ID: <code>{id}</code>"
-    help_btn: "Click me for help!"
+    help_btn: "לחץ כאן לעזרה!"
     help_txt: "Click the button below for help!"
     delmsg_filter_title: 'מחק את ההודעה'
     send_text: Please send the reply message!
