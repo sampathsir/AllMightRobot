@@ -75,7 +75,7 @@ async def help_cb(event, strings):
     button = help_markup(MOD_HELP)
     button.add(InlineKeyboardButton(strings['back'], callback_data='go_to_start'))
     with suppress(MessageNotModified):
-        await event.message.edit_text(strings['help_header'], reply_markup=button)
+        await event.message.edit_text("This is help. You get help.", reply_markup=button)
 
 
 @register(regexp='lang_btn', f='cb')
@@ -93,7 +93,7 @@ async def back_btn(event):
 @get_strings_dec('pm_menu')
 async def help_cmd(message, strings):
     button = help_markup(MOD_HELP)
-    await message.reply(strings['help_header'], reply_markup=button)
+    await message.reply("This is help. You get help.", reply_markup=button)
 
 @register(helpmenu_cb.filter(), f='cb', allow_kwargs=True)
 async def helpmenu_callback(query, callback_data=None, **kwargs):
