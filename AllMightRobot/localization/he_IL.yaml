@@ -71,9 +71,13 @@ STRINGS:
   filters:
     no_filters_found: "No filters was found in <b>{chat_name}</b>!"
     #/addfilter
+    anon_detected: Being anonymous admin, you cannot add new filters, use connections instead.
+    regex_too_slow: "Your regex pattern is matching too slow (more than the half of second), it can't be added!"
+    cancel_btn: "🛑 Cancel"
     adding_filter: |
       Adding filter <code>{handler}</code> in <b>{chat_name}</b>
       Select action below:
+    saved: "New filter was successfully saved!"
     #/filters
     list_filters: "טריגרים ב <b>{chat_name}</b>:\n"
     #/delfilter
@@ -82,6 +86,12 @@ STRINGS:
     select_filter_to_remove: |
       I have found many filters with handler '<code>{handler}</code>'.
       Please select one to remove:
+    #/delfilters or /delallfilters
+    not_chat_creator: Only chat creators can use this command!
+    delall_header: This would delete all filters in this chat. This IS irreversible.
+    confirm_yes: '⚠ Delete all'
+    confirm_no: '❌ Cancel'
+    delall_success: Successfully deleted all ({count}) filters in this chat!
   warns:
     #/warn
     warn_sofi: "Haha no way to warn myself!"
@@ -91,8 +101,8 @@ STRINGS:
     warn_bun: "Warnings has been exceeded! {user} has been banned!"
     warn_num: "Warns: {curr_warns}/{max_warns}\n"
     warn_rsn: "סיבה: <code>{reason}</code>\n"
-    max_warn_exceeded: Warnings has been exceeded! %s has been %s!
-    "max_warn_exceeded:tmute": Warnings has been exceeded! %s has been tmuted for %s!
+    max_warn_exceeded: Warnings has been exceeded! {user} has been {action}!
+    "max_warn_exceeded:tmute": Warnings has been exceeded! {user} has been tmuted for {time}!
     #warn rmv callback
     warn_no_admin_alert: "⚠ You are NOT admin to remove warn!"
     warn_btn_rmvl_success: "✅ Warn removed by {admin} !"
@@ -118,7 +128,8 @@ STRINGS:
     wrng_args: |
       These are the available options:
       <code>%s</code>
-    mode_info: 'Current mode in this chat is <b>%s</b>.'
+    mode_info: |
+      Current mode in this chat is <b>%s</b>.
     banned: נחסם
     muted: הושתק
     filters_title: הזהר את המשתמש
@@ -139,6 +150,8 @@ STRINGS:
     delmsg_filter_title: 'מחק את ההודעה'
     send_text: Please send the reply message!
     replymsg_filter_title: 'השב להודעה'
+    send_customised_reason: Send the <i>reason</i> you want to include in action message. "<code>None</code>" for <i>no reason</i> to be given!
+    expected_text: Expected a text message!
   promotes:
     promote_success: "{user} was successfully promoted in {chat_name}!"
     promote_title: "\nWith custom role <code>{role}</code>!"
@@ -153,6 +166,7 @@ STRINGS:
     start_hi_group: 'Hey there! My name is AllMight'
     start_hi: "Hey there! My name is AllMight, I help you manage your group in an efficient way!"
     btn_help: "❔ עזרה"
+    btn_add: "➕ Add me to your chat"
     btn_lang: "🇮🇱 שפה"
     btn_chat: "👥 AllMight הקבוצה"
     btn_channel: "📡 AllMight ערוץ העדכונים"
@@ -201,7 +215,8 @@ STRINGS:
       <b>Name:</b> {name}
       <b>ID:</b> <code>{id}</code>
       <b>Creator:</b> {creator}
-      Use <code>/fjoin {id}</code> to connect federation to chat
+      Use <code>/fjoin {id}</code> to connect federation to chat\
+    disallow_anon: Being anonymous, you cannot create new federation!
     #/fjoin
     only_creators: "You should be a chat creator to be able to connect chat to federation."
     fed_id_invalid: "The given Federation ID is invalid! Please give me a Valid ID."
@@ -355,13 +370,14 @@ STRINGS:
     fbanned_count_pm: "You are fbanned in {count} federation(s)!\n"
     "fban_info:fcheck": "You have been fbanned in {fed} federation on {date}, No reason where given!"
     "fban_info:fcheck:reason": "You have been fbanned in {fed} federation on {date} because of reason -\n {reason}\n"
-    fbanned_data: "{user} has been fbanned in {count} federation(s)\n"
+    fbanned_data: "{user} has been fbanned in {count} federation(s).\n"
     fbanned_nowhere: "{user} isn't fbanned anywhere!"
     fbanned_in_fed: "Including this <b>{fed}</b> federation!\n"
     "fbanned_in_fed:reason": "Including this <b>{fed}</b> federation for reason of -\n <code>{reason}</code>"
     contact_in_pm: "\n\nFor more info on your fbans, please direct message me thus your privacy is secured!"
     too_long_fbaninfo: "Well! your fbaninfo requires a file!"
     didnt_fbanned: "You ain't fbanned in this fed."
+    not_fbanned_in_fed: Anyway, they aren't fbanned in fed <b>{fed_name}</b>
   reports:
     user_user_admin: "You're an admin here, why'd you need to report someone?.."
     user_is_whitelisted: "You're a whitelisted user, why'd you need to report someone?.."
@@ -383,7 +399,7 @@ STRINGS:
     select_pm_lang: "\n<b>Select your new language:</b>"
     select_chat_lang: "\n<b>Select new chat language:</b>"
     crowdin_btn: "עזרו לנו עם התרגום"
-    help_us_translate: "\n\n<a href=\"https://crowdin.com/project/AllMightbot\">🌎 Help us improve languages</a>"
+    help_us_translate: "\n\n<a href=\"https://crowdin.com/project/sophiebot\">🌎 Help us improve languages</a>"
     not_supported_lang: This language not supported!
     lang_changed: Language was changed to <b>{lang_name}</b>.
     see_translators: '👥 See translators'
@@ -396,6 +412,11 @@ STRINGS:
       <b>Current connected chat:</b>
       {chat_name}
       Write /disconect to disconnect from chat
+    "connected_chat:cmds": |
+      <b>Current connected chat:</b>
+      {chat_name}, (bridged commands are {commands}),
+      ⚠ <i>You can only access bridged commands of the connected chat! all other commands would be treated as Local chat</i>
+      Write /disconect to disconnect from chat.
     u_wasnt_connected: "You was not connected to any chat before!"
     select_chat_to_connect: "\n<b>Select a chat to connect:</b>"
     disconnected: "You were disconnected from <b>{chat_name}</b>."
@@ -411,16 +432,18 @@ STRINGS:
     not_in_chat: "You're not in this chat anymore, I'll disconnect you."
     u_should_be_admin: "You should be an admin in {}!"
     usage_only_in_groups: "Usage limited only in groups!"
-    anon_admin_warn: |
-      You cant connect from chat as long as you are anonymous!
-      try connecting through PM, you wont have admin rights anyway.
+    anon_admin_conn: |
+      Please click below button to connect!
+    click_here: Click here!
   global:
     u_not_admin: You should be an admin to do this!
     #Rights
     "bot_no_right:not_admin": אני לא מנהל!
-    bot_no_right: "I dont have required permission to-do it! \nMissing permission: <b>%s</b>"
-    user_no_right: "You should have required permission to-do it! \nMissing permission: <b>%s</b>"
+    bot_no_right: "I dont have permission to {permission} here!"
+    user_no_right: "You don't have permission to {permission} here!"
     "user_no_right:not_admin": You should be admin to-do it!
+    #is chat creator
+    unable_identify_creator: "Unable to identify anonymous chat creator, duplicate signature (titles) found!"
   owner_stuff:
     father: "\nהוא היוצר שלי."
     sudo_crown: "\nHey! Look, that user has a crown, let me see it... Wow, it has an engraving - <b>'sudo user'</b>!"
@@ -461,7 +484,7 @@ STRINGS:
     big_file: Supported importing files only under 50 MB!
     started_importing: Importing started! Please wait...
     bad_file: Bad file! Expected <code>'general'</code> column.
-    file_version_so_new: Exported file version is newer than AllMight currently supports!
+    file_version_so_new: Exported file version is newer than Sophie currently supports!
     imports_locked: Please wait %s till using imports again!
     import_done: Import done!
   restrictions:
@@ -571,11 +594,19 @@ STRINGS:
     welcomemute_disabled: Welcome mute disabled in <b>%s</b>
     welcomemute_status: Welcome mute is <code>{status}</code> in <b>{chat_name}</b>
     #/welcomesecurity
-    welcomesecurity_enabled: Welcome security enabled in <b>{chat_name}</b> to <code>{level}</code> level.
+    welcomesecurity_enabled: Welcome security enabled in <b>{chat_name}</b> to <code>{level}</code>.
+    "welcomesecurity_enabled:customized_time": |
+      Welcome security enabled in <b>{chat_name}</b> to <code>{level}</code>, and kick users which aren't verified within {time}.
+    ask_for_time_customization: |
+      Do you want to customize the time period to kick unverified user? (by default it's {time})
+    send_time: Please send time.
+    invalid_time: "Invalid time!"
     welcomesecurity_enabled_word: enabled, set to level {level}
     welcomesecurity_disabled: Welcome security disabled in <b>%s</b>.
     welcomesecurity_invalid_arg: Invalid argument, expected <code>button</code>/<code>captcha</code>.
     welcomesecurity_status: Welcome security is <code>{status}</code> in <b>{chat_name}</b>
+    yes_btn: "Yes"
+    no_btn: "No"
     #Welcomesecurity handler
     click_here: לחץ כאן!
     not_allowed: You are not allowed to use this!
@@ -599,20 +630,8 @@ STRINGS:
     #/resetwelcome
     deleted: Successfully resetted greetings in <b>{chat}</b>!
     not_found: There's nothing to reset!
-    #/welcomerestrict
-    del_url: Message containing URL from {user} was deleted!
-    del_fwd: Forwarded message from {user} was deleted!
-    del_media: Message containing media from {user} was deleted!
-    banned: '{by} banned {user}!'
-    whitelisted: '{by} whitelisted {user}!'
-    enabled_sucessfully: Chat security enabled successfully in <b>{chat}</b>
-    disabled_sucessfully: Chat security disabled successfully in <b>{chat}</b>
-    already_enabled: Chat security is already enabled!
-    already_disabled: Chat security is already disabled!
-    restrict_status: Welcome restrict is <b>{state}</b> in <b>{chat}</b>!
-    unkown_option: Please give me valid option! (<code>enable</code> or <code>disable</code>)
-    whitelist: '🏳️ רשימה לבנה'
-    ban: '❌ חסימה'
+    #...
+    verification_done: Verification is done! You have been unmuted.
   locks:
     locks_header: "Here is the current lock settings in {chat_title} \n\n"
     no_lock_args: Give me some args to lock!
@@ -622,3 +641,25 @@ STRINGS:
     no_unlock_args: Give me some args to unlock!
     not_locked: Bruh, its not locked to unlock.
     unlocked_successfully: Unlocked {lock} in {chat} successfully!
+  antiflood:
+    #enforcer
+    flood_exceeded: "{action} {user} for flooding!"
+    #/setflood
+    "invalid_args:setflood": "Expected an integer!"
+    overflowed_count: Maximum count should be less than 200!
+    config_proc_1: Please send expiration time, '0' (zero) for not being expired.
+    cancel: '❌ Cancel'
+    setup_success: Successfully configured antiflood, now enforces against those who sends {count} messages within {time}!
+    "setup_success:no_exp": Successfully configured antiflood, allows {count} messages consecutively!
+    invalid_time: Invalid time!
+    #/antiflood | /flood
+    not_configured: Antiflood isn't configured in this chat yet!
+    turned_off: Disabled antiflood in <b>{chat_title}</b>!
+    "configuration_info:with_time": Antiflood is configured in this chat, those who sents {count} message within {time} would be {action}!
+    configuration_info: Antiflood is configured in this chat, those who sents {count} consecutively would be {action}!
+    ban: banned
+    mute: muted
+    kick: kicked
+    #/setfloodaction
+    invalid_args: "Unsupported action, expected {supported_actions}!"
+    setfloodaction_success: "Successfully updated flood action to <b>{action}</b>!"
