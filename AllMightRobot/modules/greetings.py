@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Aiogram
 
 #
-# This file is part of AllMightBot.
+# This file is part of AllMightRobot.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -22,17 +22,21 @@ import random
 import re
 from contextlib import suppress
 from datetime import datetime
+from typing import Optional, Union
 
 from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.utils.exceptions import MessageToDeleteNotFound, MessageCantBeDeleted, BadRequest, ChatAdminRequired
+from aiogram.types import CallbackQuery, ContentType, Message
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types.input_media import InputMediaPhoto
+from aiogram.utils.callback_data import CallbackData
+from aiogram.utils.exceptions import MessageToDeleteNotFound, MessageCantBeDeleted, BadRequest, ChatAdminRequired
 from apscheduler.jobstores.base import JobLookupError
+from babel.dates import format_timedelta
 from captcha.image import ImageCaptcha
 from telethon.tl.custom import Button
 
-from AllMightRobot import BOT_USERNAME, BOT_ID, bot
+from AllMightRobot import BOT_USERNAME, BOT_ID, bot, dp
 from AllMightRobot.config import get_str_key
 from AllMightRobot.decorator import register
 from AllMightRobot.services.apscheduller import scheduler
@@ -46,6 +50,7 @@ from .utils.message import need_args_dec, convert_time
 from .utils.notes import get_parsed_note_list, t_unparse_note_item, send_note
 from .utils.restrictions import mute_user, restrict_user, unmute_user, kick_user
 from .utils.user_details import is_user_admin, get_user_link, check_admin_rights
+from ..utils.cached import cached
 
 
 class WelcomeSecurityState(StatesGroup):
@@ -66,7 +71,7 @@ async def welcome(message, chat, strings):
     else:
         no_format = None
 
-    if not (db_item := await db.greetings.find_one({'chat_id': chat_id})):
+    if not (db_item := await get_greetings_data(chat_id)):
         db_item = {}
     if 'note' not in db_item:
         db_item['note'] = {'text': strings['default_welcome']}
@@ -117,7 +122,7 @@ async def set_welcome(message, chat, strings):
     chat_id = chat['chat_id']
 
     if len(args := message.get_args().lower().split()) < 1:
-        db_item = await db.greetings.find_one({'chat_id': chat_id})
+        db_item = await get_greetings_data(chat_id)
 
         if db_item and 'welcome_disabled' in db_item and db_item['welcome_disabled'] is True:
             status = strings['disabled']
@@ -132,6 +137,7 @@ async def set_welcome(message, chat, strings):
     if args[0] in no:
         await db.greetings.update_one({'chat_id': chat_id}, {'$set': {'chat_id': chat_id, 'welcome_disabled': True}},
                                       upsert=True)
+        await get_greetings_data.reset_cache(chat_id)
         await message.reply(strings['turnwelcome_disabled'] % chat['chat_title'])
         return
     else:
@@ -146,6 +152,7 @@ async def set_welcome(message, chat, strings):
         else:
             text = strings['saved']
 
+        await get_greetings_data.reset_cache(chat_id)
         await message.reply(text % chat['chat_title'])
 
 
@@ -156,9 +163,11 @@ async def reset_welcome(message, chat, strings):
     chat_id = chat['chat_id']
 
     if (await db.greetings.delete_one({'chat_id': chat_id})).deleted_count < 1:
+        await get_greetings_data.reset_cache(chat_id)
         await message.reply(strings['not_found'])
         return
 
+    await get_greetings_data.reset_cache(chat_id)
     await message.reply(strings['deleted'].format(chat=chat['chat_title']))
 
 
@@ -169,7 +178,7 @@ async def clean_welcome(message, chat, strings):
     chat_id = chat['chat_id']
 
     if len(args := message.get_args().lower().split()) < 1:
-        db_item = await db.greetings.find_one({'chat_id': chat_id})
+        db_item = await get_greetings_data(chat_id)
 
         if db_item and 'clean_welcome' in db_item and db_item['clean_welcome']['enabled'] is True:
             status = strings['enabled']
@@ -188,9 +197,11 @@ async def clean_welcome(message, chat, strings):
             {'$set': {'chat_id': chat_id, 'clean_welcome': {'enabled': True}}},
             upsert=True
         )
+        await get_greetings_data.reset_cache(chat_id)
         await message.reply(strings['cleanwelcome_enabled'] % chat['chat_title'])
     elif args[0] in no:
         await db.greetings.update_one({'chat_id': chat_id}, {'$unset': {'clean_welcome': 1}}, upsert=True)
+        await get_greetings_data.reset_cache(chat_id)
         await message.reply(strings['cleanwelcome_disabled'] % chat['chat_title'])
     else:
         await message.reply(strings['bool_invalid_arg'])
@@ -203,7 +214,7 @@ async def clean_service(message, chat, strings):
     chat_id = chat['chat_id']
 
     if len(args := message.get_args().lower().split()) < 1:
-        db_item = await db.greetings.find_one({'chat_id': chat_id})
+        db_item = await get_greetings_data(chat_id)
 
         if db_item and 'clean_service' in db_item and db_item['clean_service']['enabled'] is True:
             status = strings['enabled']
@@ -222,9 +233,11 @@ async def clean_service(message, chat, strings):
             {'$set': {'chat_id': chat_id, 'clean_service': {'enabled': True}}},
             upsert=True
         )
+        await get_greetings_data.reset_cache(chat_id)
         await message.reply(strings['cleanservice_enabled'] % chat['chat_title'])
     elif args[0] in no:
         await db.greetings.update_one({'chat_id': chat_id}, {'$unset': {'clean_service': 1}}, upsert=True)
+        await get_greetings_data.reset_cache(chat_id)
         await message.reply(strings['cleanservice_disabled'] % chat['chat_title'])
     else:
         await message.reply(strings['bool_invalid_arg'])
@@ -237,7 +250,7 @@ async def welcome_mute(message, chat, strings):
     chat_id = chat['chat_id']
 
     if len(args := message.get_args().lower().split()) < 1:
-        db_item = await db.greetings.find_one({'chat_id': chat_id})
+        db_item = await get_greetings_data(chat_id)
 
         if db_item and 'welcome_mute' in db_item and db_item['welcome_mute']['enabled'] is True:
             status = strings['enabled']
@@ -255,6 +268,7 @@ async def welcome_mute(message, chat, strings):
             {'$set': {'chat_id': chat_id, 'welcome_mute': {'enabled': True, 'time': args[0]}}},
             upsert=True
         )
+        await get_greetings_data.reset_cache(chat_id)
         text = strings['welcomemute_enabled'] % chat['chat_title']
         try:
             await message.reply(text)
@@ -263,6 +277,7 @@ async def welcome_mute(message, chat, strings):
     elif args[0] in no:
         text = strings['welcomemute_disabled'] % chat['chat_title']
         await db.greetings.update_one({'chat_id': chat_id}, {'$unset': {'welcome_mute': 1}}, upsert=True)
+        await get_greetings_data.reset_cache(chat_id)
         try:
             await message.reply(text)
         except BadRequest:
@@ -277,6 +292,13 @@ async def welcome_mute(message, chat, strings):
 
 # Welcome Security
 
+wlcm_sec_config_proc = CallbackData("wlcm_sec_proc", "chat_id", "user_id", "level")
+wlcm_sec_config_cancel = CallbackData("wlcm_sec_cancel", "user_id", "level")
+
+
+class WelcomeSecurityConf(StatesGroup):
+    send_time = State()
+
 
 @register(cmds='welcomesecurity', user_admin=True)
 @chat_connection(admin=True, only_groups=True)
@@ -285,7 +307,7 @@ async def welcome_security(message, chat, strings):
     chat_id = chat['chat_id']
 
     if len(args := message.get_args().lower().split()) < 1:
-        db_item = await db.greetings.find_one({'chat_id': chat_id})
+        db_item = await get_greetings_data(chat_id)
 
         if db_item and 'welcome_security' in db_item and db_item['welcome_security']['enabled'] is True:
             status = strings['welcomesecurity_enabled_word'].format(level=db_item['welcome_security']['level'])
@@ -301,6 +323,7 @@ async def welcome_security(message, chat, strings):
         level = args[0].lower()
     elif args[0] in no:
         await db.greetings.update_one({'chat_id': chat_id}, {'$unset': {'welcome_security': 1}}, upsert=True)
+        await get_greetings_data.reset_cache(chat_id)
         await message.reply(strings['welcomesecurity_disabled'] % chat['chat_title'])
         return
     else:
@@ -312,7 +335,81 @@ async def welcome_security(message, chat, strings):
         {'$set': {'chat_id': chat_id, 'welcome_security': {'enabled': True, 'level': level}}},
         upsert=True
     )
-    await message.reply(strings['welcomesecurity_enabled'].format(chat_name=chat['chat_title'], level=level))
+    await get_greetings_data.reset_cache(chat_id)
+    buttons = InlineKeyboardMarkup()
+    buttons.add(
+        InlineKeyboardButton(
+            strings["no_btn"], callback_data=wlcm_sec_config_cancel.new(
+                user_id=message.from_user.id, level=level
+            )
+        ),
+        InlineKeyboardButton(
+            strings["yes_btn"], callback_data=wlcm_sec_config_proc.new(
+                chat_id=chat_id, user_id=message.from_user.id, level=level
+            )
+        )
+    )
+    await message.reply(
+        strings['ask_for_time_customization'].format(
+            time=format_timedelta(
+                convert_time(
+                    get_str_key("JOIN_CONFIRM_DURATION")
+                ),
+                locale=strings['language_info']['babel']
+            )
+        ),
+        reply_markup=buttons
+    )
+
+
+@register(wlcm_sec_config_cancel.filter(), f='cb', allow_kwargs=True)
+@chat_connection(admin=True)
+@get_strings_dec("greetings")
+async def welcome_security_config_cancel(event: CallbackQuery, chat: dict, strings: dict, callback_data: dict, **_):
+    if int(callback_data['user_id']) == event.from_user.id and is_user_admin(chat['chat_id'], event.from_user.id):
+        await event.message.edit_text(
+            text=strings['welcomesecurity_enabled'].format(chat_name=chat['chat_title'], level=callback_data['level'])
+        )
+
+
+@register(wlcm_sec_config_proc.filter(), f='cb', allow_kwargs=True)
+@chat_connection(admin=True)
+@get_strings_dec("greetings")
+async def welcome_security_config_proc(event: CallbackQuery, chat: dict, strings: dict, callback_data: dict, **_):
+    if int(callback_data['user_id']) != event.from_user.id and is_user_admin(chat['chat_id'], event.from_user.id):
+        return
+
+    await WelcomeSecurityConf.send_time.set()
+    async with dp.get_current().current_state().proxy() as data:
+        data["level"] = callback_data["level"]
+    await event.message.edit_text(strings["send_time"])
+
+
+@register(state=WelcomeSecurityConf.send_time, content_types=ContentType.TEXT, allow_kwargs=True)
+@chat_connection(admin=True)
+@get_strings_dec("greetings")
+async def wlcm_sec_time_state(message: Message, chat: dict, strings: dict, state, **_):
+    async with state.proxy() as data:
+        level = data["level"]
+    try:
+        con_time = convert_time(message.text)
+    except (ValueError, TypeError):
+        await message.reply(strings["invalid_time"])
+    else:
+        await db.greetings.update_one(
+            {"chat_id": chat["chat_id"]},
+            {"$set": {"welcome_security.expire": message.text}}
+        )
+        await get_greetings_data.reset_cache(chat['chat_id'])
+        await message.reply(
+            strings["welcomesecurity_enabled:customized_time"].format(
+                chat_name=chat['chat_title'], level=level, time=format_timedelta(
+                    con_time, locale=strings['language_info']['babel']
+                )
+            )
+        )
+    finally:
+        await state.finish()
 
 
 @register(cmds=['setsecuritynote', 'sevesecuritynote'], user_admin=True)
@@ -323,7 +420,7 @@ async def set_security_note(message, chat, strings):
     chat_id = chat['chat_id']
 
     if message.get_args().lower().split()[0] in ['raw', 'noformat']:
-        db_item = await db.greetings.find_one({'chat_id': chat_id})
+        db_item = await get_greetings_data(chat_id)
         if 'security_note' not in db_item:
             db_item = {'security_note': {}}
             db_item['security_note']['text'] = strings['default_security_note']
@@ -339,6 +436,7 @@ async def set_security_note(message, chat, strings):
 
     if (await db.greetings.update_one({'chat_id': chat_id}, {'$set': {'chat_id': chat_id, 'security_note': note}},
                                       upsert=True)).modified_count > 0:
+        await get_greetings_data.reset_cache(chat_id)
         text = strings['security_note_updated']
     else:
         text = strings['security_note_saved']
@@ -354,6 +452,7 @@ async def reset_security_note(message, chat, strings):
 
     if (await db.greetings.update_one({'chat_id': chat_id}, {'$unset': {'security_note': 1}},
                                       upsert=True)).modified_count > 0:
+        await get_greetings_data.reset_cache(chat_id)
         text = strings['security_note_updated']
     else:
         text = strings['del_security_note_ok']
@@ -363,10 +462,9 @@ async def reset_security_note(message, chat, strings):
 
 @register(only_groups=True, f='welcome')
 @get_strings_dec('greetings')
-async def welcome_security_handler(message, strings):
-
+async def welcome_security_handler(message: Message, strings):
     if len(message.new_chat_members) > 1:
-        # FIXME: AllMight doesnt support adding multiple users currently
+        # FIXME: AllMightRobot doesnt support adding multiple users currently
         return
 
     new_user = message.new_chat_members[0]
@@ -376,11 +474,11 @@ async def welcome_security_handler(message, strings):
     if user_id == BOT_ID:
         return
 
-    db_item = await db.greetings.find_one({'chat_id': chat_id})
+    db_item = await get_greetings_data(message.chat.id)
     if not db_item or 'welcome_security' not in db_item:
         return
 
-    if not await check_admin_rights(chat_id, BOT_ID, ['can_restrict_members']):
+    if not await check_admin_rights(message, chat_id, BOT_ID, ['can_restrict_members']):
         await message.reply(strings['not_admin_ws'])
         return
 
@@ -405,13 +503,12 @@ async def welcome_security_handler(message, strings):
         return await message.reply(f'welcome security failed due to {error.args[0]}')
 
     if 'security_note' not in db_item:
-        db_item = {'security_note': {}}
+        db_item['security_note'] = {}
         db_item['security_note']['text'] = strings['default_security_note']
         db_item['security_note']['parse_mode'] = 'md'
 
     text, kwargs = await t_unparse_note_item(message, db_item['security_note'], chat_id)
 
-    db_item = await db.greetings.find_one({'chat_id': chat_id})
     kwargs['reply_to'] = (None if 'clean_service' in db_item and db_item['clean_service']['enabled'] is True
                           else message.message_id)
 
@@ -422,11 +519,16 @@ async def welcome_security_handler(message, strings):
 
     redis.set(f'welcome_security_users:{user_id}:{chat_id}', msg.id)
 
+    if raw_time := db_item['welcome_security'].get('expire', None):
+        time = convert_time(raw_time)
+    else:
+        time = convert_time(get_str_key('JOIN_CONFIRM_DURATION'))
+
     scheduler.add_job(
         join_expired,
         "date",
         id=f"wc_expire:{chat_id}:{user_id}",
-        run_date=datetime.utcnow() + convert_time(get_str_key('JOIN_CONFIRM_DURATION')),
+        run_date=datetime.utcnow() + time,
         kwargs={'chat_id': chat_id, 'user_id': user_id, 'message_id': msg.id, 'wlkm_msg_id': message.message_id},
         replace_existing=True
     )
@@ -471,7 +573,7 @@ async def ws_redirecter(message, strings):
 
 @register(CommandStart(re.compile(r'ws_')), allow_kwargs=True)
 @get_strings_dec('greetings')
-async def welcome_security_handler_pm(message, strings, regexp=None, state=None, **kwargs):
+async def welcome_security_handler_pm(message: Message, strings, regexp=None, state=None, **kwargs):
     args = message.get_args().split('_')
     chat_id = int(args[1])
 
@@ -480,7 +582,7 @@ async def welcome_security_handler_pm(message, strings, regexp=None, state=None,
         data['msg_id'] = int(args[3])
         data['to_delete'] = bool(int(args[4])) if len(args) > 4 else True
 
-    db_item = await db.greetings.find_one({'chat_id': chat_id})
+    db_item = await get_greetings_data(chat_id)
 
     level = db_item['welcome_security']['level']
 
@@ -666,7 +768,7 @@ async def wc_math_check_cb(event, strings, state=None, **kwargs):
 
 
 @get_strings_dec('greetings')
-async def welcome_security_passed(message, state, strings):
+async def welcome_security_passed(message: Union[CallbackQuery, Message], state, strings):
     user_id = message.from_user.id
     async with state.proxy() as data:
         chat_id = data['chat_id']
@@ -701,13 +803,13 @@ async def welcome_security_passed(message, state, strings):
     else:
         await message.reply(strings['passed'] % title)
 
-    db_item = await db.greetings.find_one({'chat_id': chat_id})
+    db_item = await get_greetings_data(chat_id)
 
     if 'message' in message:
         message = message.message
 
     # Welcome
-    if 'note' in db_item:
+    if 'note' in db_item and db_item.get("welcome_disabled", True) is False:
         text, kwargs = await t_unparse_note_item(
             message.reply_to_message if message.reply_to_message is not None else message,
             db_item['note'],
@@ -721,16 +823,31 @@ async def welcome_security_passed(message, state, strings):
         if 'can_send_messages' not in user or user['can_send_messages'] is True:
             await restrict_user(chat_id, user_id, until_date=convert_time(db_item['welcome_mute']['time']))
 
+    chat = await db.chat_list.find_one({'chat_id': chat_id})
+
+    buttons = None
+    if chat_nick := chat['chat_nick'] if chat.get('chat_nick', None) else None:
+        buttons = InlineKeyboardMarkup().add(
+            InlineKeyboardButton(
+                text=strings['click_here'], url=f"t.me/{chat_nick}"
+            )
+        )
+
+    await bot.send_message(
+        user_id,
+        strings['verification_done'],
+        reply_markup=buttons
+    )
+
 
 # End Welcome Security
 
 # Welcomes
 @register(only_groups=True, f='welcome')
 @get_strings_dec('greetings')
-async def welcome_trigger(message, strings):
-
+async def welcome_trigger(message: Message, strings):
     if len(message.new_chat_members) > 1:
-        # FIXME: AllMight doesnt support adding multiple users currently
+        # FIXME: AllMightRobot doesnt support adding multiple users currently
         return
 
     chat_id = message.chat.id
@@ -739,7 +856,7 @@ async def welcome_trigger(message, strings):
     if user_id == BOT_ID:
         return
 
-    if not (db_item := await db.greetings.find_one({'chat_id': chat_id})):
+    if not (db_item := await get_greetings_data(message.chat.id)):
         db_item = {}
 
     if 'welcome_disabled' in db_item and db_item['welcome_disabled'] is True:
@@ -762,9 +879,9 @@ async def welcome_trigger(message, strings):
     if 'clean_welcome' in db_item and db_item['clean_welcome']['enabled'] is not False:
         if 'last_msg' in db_item['clean_welcome']:
             with suppress(MessageToDeleteNotFound, MessageCantBeDeleted):
-                await bot.delete_message(chat_id, db_item['clean_welcome']['last_msg'])
-        await db.greetings.update_one({'_id': db_item['_id']}, {'$set': {'clean_welcome.last_msg': msg.id}},
-                                      upsert=True)
+                if value := redis.get(_clean_welcome.format(chat=chat_id)):
+                    await bot.delete_message(chat_id, value)
+        redis.set(_clean_welcome.format(chat=chat_id), msg.id)
 
     # Welcome mute
     if user_id == BOT_ID:
@@ -772,7 +889,7 @@ async def welcome_trigger(message, strings):
     if 'welcome_mute' in db_item and db_item['welcome_mute']['enabled'] is not False:
         user = await bot.get_chat_member(chat_id, user_id)
         if 'can_send_messages' not in user or user['can_send_messages'] is True:
-            if not await check_admin_rights(chat_id, BOT_ID, ['can_restrict_members']):
+            if not await check_admin_rights(message, chat_id, BOT_ID, ['can_restrict_members']):
                 await message.reply(strings['not_admin_wm'])
                 return
 
@@ -788,13 +905,13 @@ async def clean_service_trigger(message, strings):
     if message.new_chat_members[0].id == BOT_ID:
         return
 
-    if not (db_item := await db.greetings.find_one({'chat_id': chat_id})):
+    if not (db_item := await get_greetings_data(chat_id)):
         return
 
     if 'clean_service' not in db_item or db_item['clean_service']['enabled'] is False:
         return
 
-    if not await check_admin_rights(chat_id, BOT_ID, ['can_delete_messages']):
+    if not await check_admin_rights(message, chat_id, BOT_ID, ['can_delete_messages']):
         await bot.send_message(chat_id, strings['not_admin_wsr'])
         return
 
@@ -802,8 +919,16 @@ async def clean_service_trigger(message, strings):
         await message.delete()
 
 
+_clean_welcome = 'cleanwelcome:{chat}'
+
+
+@cached()
+async def get_greetings_data(chat: int) -> Optional[dict]:
+    return await db.greetings.find_one({'chat_id': chat})
+
+
 async def __export__(chat_id):
-    if greetings := await db.greetings.find_one({'chat_id': chat_id}):
+    if greetings := await get_greetings_data(chat_id):
         del greetings['_id']
         del greetings['chat_id']
 
@@ -812,3 +937,4 @@ async def __export__(chat_id):
 
 async def __import__(chat_id, data):
     await db.greetings.update_one({'chat_id': chat_id}, {'$set': data}, upsert=True)
+    await get_greetings_data.reset_cache(chat_id)

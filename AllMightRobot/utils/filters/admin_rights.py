@@ -72,8 +72,10 @@ class UserRestricting(Filter):
         if message.chat.type == 'private':
             return True
 
-        if not (p := await check_admin_rights(message.chat.id, user_id, self.required_permissions.keys())) is True:
-            await self.no_rights_msg(event, p)
+        check = await check_admin_rights(message, message.chat.id, user_id, self.required_permissions.keys())
+        if check is not True:
+            # check = missing permission in this scope
+            await self.no_rights_msg(event, check)
             return False
 
         return True
@@ -86,8 +88,9 @@ class UserRestricting(Filter):
                                     else message.chat.id, 'global')
         task = message.answer if hasattr(message, 'message') else message.reply
         if not isinstance(required_permissions, bool):  # Check if check_admin_rights func returned missing perm
+            required_permissions = ' '.join(required_permissions.strip('can_').split('_'))
             try:
-                await task(strings['user_no_right'] % required_permissions)
+                await task(strings['user_no_right'].format(permission=required_permissions))
             except BadRequest as error:
                 if error.args == 'Reply message not found':
                     return await message.answer(strings['user_no_right'])
@@ -120,8 +123,9 @@ class BotHasPermissions(UserRestricting):
         message = message.message if isinstance(message, CallbackQuery) else message
         strings = await get_strings(message.chat.id, 'global')
         if not isinstance(required_permissions, bool):
+            required_permissions = ' '.join(required_permissions.strip('can_').split('_'))
             try:
-                await message.reply(strings['bot_no_right'] % required_permissions)
+                await message.reply(strings['bot_no_right'].format(permission=required_permissions))
             except BadRequest as error:
                 if error.args == 'Reply message not found':
                     return await message.answer(strings['bot_no_right'])

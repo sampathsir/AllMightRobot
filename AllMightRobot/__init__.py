@@ -21,7 +21,6 @@ import logging
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
-
 from AllMightRobot.config import get_str_key, get_int_key, get_list_key, get_bool_key
 from AllMightRobot.utils.logger import log
 from AllMightRobot.versions import AllMight_VERSION

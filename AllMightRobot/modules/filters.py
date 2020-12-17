@@ -2,7 +2,7 @@
 # Copyright (C) 2019 Aiogram
 
 #
-# This file is part of AllMightBot.
+# This file is part of AllMightRobot.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,29 +16,37 @@
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import asyncio
+import functools
+import random
 import re
+from contextlib import suppress
+from string import printable
 
+import regex
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.types import Message, CallbackQuery
 from aiogram.types.inline_keyboard import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
-from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.utils.exceptions import MessageCantBeDeleted, MessageToDeleteNotFound
+from async_timeout import timeout
 from bson.objectid import ObjectId
 from pymongo import UpdateOne
 
-from .utils.message import need_args_dec, get_args_str
-from .utils.user_details import is_user_admin
-from .utils.language import get_strings_dec, get_string
-from .utils.connections import chat_connection, get_connected_chat
-
+from AllMightRobot import loop, bot
 from AllMightRobot.decorator import register
 from AllMightRobot.modules import LOADED_MODULES
 from AllMightRobot.services.mongo import db
 from AllMightRobot.services.redis import redis
 from AllMightRobot.utils.logger import log
-
+from .utils.connections import chat_connection, get_connected_chat
+from .utils.language import get_strings_dec, get_string
+from .utils.message import need_args_dec, get_args_str
+from .utils.user_details import is_user_admin, is_chat_creator
 
 filter_action_cp = CallbackData('filter_action_cp', 'filter_id')
 filter_remove_cp = CallbackData('filter_remove_cp', 'id')
+filter_delall_yes_cb = CallbackData('filter_delall_yes_cb', 'chat_id')
 
 FILTERS_ACTIONS = {}
 
@@ -84,11 +92,20 @@ async def check_msg(message):
         if text[1:].startswith('addfilter') or text[1:].startswith('delfilter'):
             return
 
-    for handler in filters:
-        pattern = re.escape(handler)
-        pattern = pattern.replace('(+)', '(.*)')
-        if re.search(pattern, text, flags=re.IGNORECASE):
+    for handler in filters:  # type: str
+        if handler.startswith("re:"):
+            func = functools.partial(regex.search, handler.replace("re:", '', 1), text, timeout=0.1)
+        else:
+            # TODO: Remove this (handler.replace(...)). kept for backward compatibility
+            func = functools.partial(re.search, re.escape(handler).replace('(+)', '(.*)'), text, flags=re.IGNORECASE)
 
+        try:
+            async with timeout(0.1):
+                matched = await loop.run_in_executor(None, func)
+        except (asyncio.TimeoutError, TimeoutError):
+            continue
+
+        if matched:
             # We can have few filters with same handler, that's why we create a new loop.
             filters = db.filters.find({'chat_id': chat_id, 'handler': handler})
             async for filter in filters:
@@ -101,7 +118,23 @@ async def check_msg(message):
 @chat_connection(only_groups=True, admin=True)
 @get_strings_dec('filters')
 async def add_handler(message, chat, strings):
-    handler = get_args_str(message).lower()
+    # filters doesn't support anon admins
+    if message.from_user.id == 1087968824:
+        return await message.reply(strings['anon_detected'])
+
+    handler = get_args_str(message)
+
+    if handler.startswith('re:'):
+        pattern = handler
+        random_text_str = ''.join(random.choice(printable) for i in range(50))
+        try:
+            regex.match(pattern, random_text_str, timeout=0.2)
+        except TimeoutError:
+            await message.reply(strings['regex_too_slow'])
+            return
+    else:
+        handler = handler.lower()
+
     text = strings['adding_filter'].format(handler=handler, chat_name=chat['chat_title'])
 
     buttons = InlineKeyboardMarkup(row_width=2)
@@ -109,10 +142,12 @@ async def add_handler(message, chat, strings):
         filter_id = action[0]
         data = action[1]
 
-        buttons.add(InlineKeyboardButton(
+        buttons.insert(InlineKeyboardButton(
             await get_string(chat['chat_id'], data['title']['module'], data['title']['string']),
             callback_data=filter_action_cp.new(filter_id=filter_id)
         ))
+    buttons.add(InlineKeyboardButton(strings['cancel_btn'], callback_data='cancel'))
+
     user_id = message.from_user.id
     chat_id = chat['chat_id']
     redis.set(f'add_filter:{user_id}:{chat_id}', handler)
@@ -120,7 +155,7 @@ async def add_handler(message, chat, strings):
         await message.reply(text, reply_markup=buttons)
 
 
-async def save_filter(message, data):
+async def save_filter(message, data, strings):
     if await db.filters.find_one(data):
         # prevent saving duplicate filter
         await message.reply('Duplicate filter!')
@@ -128,12 +163,13 @@ async def save_filter(message, data):
 
     await db.filters.insert_one(data)
     await update_handlers_cache(data['chat_id'])
-    await message.reply('Saved!')
+    await message.reply(strings['saved'])
 
 
 @register(filter_action_cp.filter(), f='cb', allow_kwargs=True)
 @chat_connection(only_groups=True, admin=True)
-async def register_action(event, chat, callback_data=None, state=None, **kwargs):
+@get_strings_dec('filters')
+async def register_action(event, chat, strings, callback_data=None, state=None, **kwargs):
     if not await is_user_admin(event.message.chat.id, event.from_user.id):
         return await event.answer('You are not admin to do this')
     filter_id = callback_data['filter_id']
@@ -155,33 +191,54 @@ async def register_action(event, chat, callback_data=None, state=None, **kwargs)
 
     if 'setup' in action:
         await NewFilter.setup.set()
+        setup_co = len(action['setup']) - 1 if type(action['setup']) is list else 0
         async with state.proxy() as proxy:
             proxy['data'] = data
             proxy['filter_id'] = filter_id
+            proxy['setup_co'] = setup_co
+            proxy['setup_done'] = 0
+            proxy['msg_id'] = event.message.message_id
 
-        await action['setup']['start'](event.message)
+        if setup_co > 0:
+            await action['setup'][0]['start'](event.message)
+        else:
+            await action['setup']['start'](event.message)
         return
 
-    await save_filter(event.message, data)
+    await save_filter(event.message, data, strings)
 
 
 @register(state=NewFilter.setup, f='any', is_admin=True, allow_kwargs=True)
 @chat_connection(only_groups=True, admin=True)
-async def setup_end(message, chat, state=None, **kwargs):
+@get_strings_dec('filters')
+async def setup_end(message, chat, strings, state=None, **kwargs):
     async with state.proxy() as proxy:
         data = proxy['data']
         filter_id = proxy['filter_id']
+        setup_co = proxy['setup_co']
+        curr_step = proxy['setup_done']
+        with suppress(MessageCantBeDeleted, MessageToDeleteNotFound):
+            await bot.delete_message(message.chat.id, proxy['msg_id'])
 
     action = FILTERS_ACTIONS[filter_id]
 
-    if not bool(a := await action['setup']['finish'](message, data)):
+    func = action['setup'][curr_step]['finish'] if type(action['setup']) is list else action['setup']['finish']
+    if not bool(a := await func(message, data)):
         await state.finish()
         return
 
     data.update(a)
 
+    if setup_co > 0:
+        await action['setup'][curr_step + 1]['start'](message)
+        async with state.proxy() as proxy:
+            proxy['data'] = data
+            proxy['setup_co'] -= 1
+            proxy['setup_done'] += 1
+        return
+
     await state.finish()
-    await save_filter(message, data)
+    await save_filter(message, data, strings)
 
 
 @register(cmds=['filters', 'listfilters'])
@@ -207,7 +264,7 @@ async def list_filters(message, chat, strings):
 @chat_connection(only_groups=True, admin=True)
 @get_strings_dec('filters')
 async def del_filter(message, chat, strings):
-    handler = get_args_str(message).lower()
+    handler = get_args_str(message)
     chat_id = chat['chat_id']
     filters = await db.filters.find({'chat_id': chat_id, 'handler': handler}).to_list(9999)
     if not filters:
@@ -250,6 +307,43 @@ async def del_filter_cb(event, chat, strings, callback_data=None, **kwargs):
     return
 
 
+@register(cmds=['delfilters', "delallfilters"])
+@get_strings_dec('filters')
+async def delall_filters(message: Message, strings: dict):
+    if not await is_chat_creator(message, message.chat.id, message.from_user.id):
+        return await message.reply(strings['not_chat_creator'])
+    buttons = InlineKeyboardMarkup()
+    buttons.add(
+        *[
+            InlineKeyboardButton(
+                strings['confirm_yes'], callback_data=filter_delall_yes_cb.new(chat_id=message.chat.id)
+            ),
+            InlineKeyboardButton(
+                strings['confirm_no'], callback_data="filter_delall_no_cb"
+            )
+        ]
+    )
+    return await message.reply(strings['delall_header'], reply_markup=buttons)
+
+
+@register(filter_delall_yes_cb.filter(), f='cb', allow_kwargs=True)
+@get_strings_dec('filters')
+async def delall_filters_yes(event: CallbackQuery, strings: dict, callback_data: dict, **_):
+    if not await is_chat_creator(event, chat_id := int(callback_data['chat_id']), event.from_user.id):
+        return False
+    result = await db.filters.delete_many({'chat_id': chat_id})
+    await update_handlers_cache(chat_id)
+    return await event.message.edit_text(strings['delall_success'].format(count=result.deleted_count))
+
+
+@register(regexp="filter_delall_no_cb", f='cb')
+@get_strings_dec('filters')
+async def delall_filters_no(event: CallbackQuery, strings: dict):
+    if not await is_chat_creator(event, event.message.chat.id, event.from_user.id):
+        return False
+    await event.message.delete()
+
+
 async def __before_serving__(loop):
     log.debug('Adding filters actions')
     for module in LOADED_MODULES:
@@ -281,3 +375,4 @@ async def __import__(chat_id, data):
                              {'$set': filter},
                              upsert=True))
     await db.filters.bulk_write(new)
+    await update_handlers_cache(chat_id)

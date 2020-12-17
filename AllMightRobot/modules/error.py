@@ -52,8 +52,9 @@ def catch_redis_error(**dec_kwargs):
                 return await func(*args, **kwargs)
             except RedisError:
                 if chat_id not in SENT:
-                    text = 'Sorry for inconvience! I encountered error in my redis DB, which is necessary for running '\
-                           'bot \n\nPlease report this to my support group immediately when you see this error!'
+                    text = 'Sorry for inconvenience! I encountered error in my redis DB, which is necessary for  ' \
+                           'running bot \n\nPlease report this to my support group immediately when you see this error!'
+
                     if await bot.send_message(chat_id, text):
                         SENT.append(chat_id)
                 # Alert bot owner
@@ -95,10 +96,14 @@ async def all_errors_handler(update: Update, error):
 
     ignored_errors = (
         'FloodWaitError', 'RetryAfter', 'SlowModeWaitError', 'InvalidQueryID'
-        'NetworkError', 'TelegramAPIError', 'RestartingTelegram'
     )
     if err_tlt in ignored_errors:
         return True
+
+    if err_tlt in ('NetworkError', 'TelegramAPIError', 'RestartingTelegram'):
+        log.error("Conn/API error detected", exc_info=error)
+        return True
+
 
     text = "<b>Sorry, I encountered a error!</b>\n"
     text += f'<code>{html.escape(err_tlt, quote=False)}: {html.escape(err_msg, quote=False)}</code>'

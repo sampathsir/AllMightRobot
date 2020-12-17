@@ -26,7 +26,7 @@ from aiogram.types.inline_keyboard import (
 
 from contextlib import suppress
 from .language import select_lang_keyboard
-
+from AllMightRobot import BOT_USERNAME
 from AllMightRobot.decorator import register
 from AllMightRobot.modules.utils.disable import disableable_dec
 from .utils.language import get_strings_dec
@@ -47,12 +47,13 @@ async def start_cmd(message):
 @get_strings_dec('pm_menu')
 async def get_start_func(message, strings, edit=False):
     msg = message.message if hasattr(message, 'message') else message
-    task = msg.edit_text if edit else msg.reply 
+    task = msg.edit_text if edit else msg.reply
     buttons = InlineKeyboardMarkup()
     buttons.add(InlineKeyboardButton(strings['btn_help'], callback_data='get_help'),
                 InlineKeyboardButton(strings['btn_lang'], callback_data='lang_btn'))
     buttons.add(InlineKeyboardButton(strings['btn_chat'], url='https://t.me/OneForAllSupport'),
                 InlineKeyboardButton(strings['btn_channel'], url='https://t.me/AllForOneUpdates'))
+    buttons.add(InlineKeyboardButton(strings['btn_add'], url=f'https://telegram.me/{BOT_USERNAME}?startgroup=true'))
     # Handle error when user click the button 2 or more times simultaneously
     with suppress(MessageNotModified):
         await task(strings['start_hi'], reply_markup=buttons)

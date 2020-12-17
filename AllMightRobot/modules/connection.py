@@ -18,21 +18,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-
+from aiogram.types import CallbackQuery
 from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import BotBlocked, CantInitiateConversation
-
+from aiogram.utils.deep_linking import get_start_link
 from AllMightRobot import bot
 from AllMightRobot.decorator import register
 from AllMightRobot.services.mongo import db
 from AllMightRobot.services.redis import redis
-from .utils.connections import chat_connection, set_connected_chat
+from .utils.connections import chat_connection, set_connected_chat, get_connection_data
 from .utils.language import get_strings_dec
 from .utils.message import get_arg
 from .utils.notes import BUTTONS
-from .utils.user_details import get_chat_dec
+from .utils.user_details import get_chat_dec, is_user_admin
 
 connect_to_chat_cb = CallbackData('connect_to_chat_cb', 'chat_id')
 
@@ -56,7 +56,13 @@ async def connect_to_chat_direct(message, strings):
     chat_id = message.chat.id
     if user_id == 1087968824:
         # just warn the user that connections with admin rights doesn't work
-        return await message.reply(strings["anon_admin_warn"])
+        return await message.reply(
+            strings['anon_admin_conn'],
+            reply_markup=InlineKeyboardMarkup().add(
+                InlineKeyboardButton(strings['click_here'], callback_data="anon_conn_cb")
+            )
+        )
+
 
     chat = await db.chat_list.find_one({'chat_id': chat_id})
     chat_title = chat['chat_title'] if chat is not None else message.chat.title
@@ -75,16 +81,30 @@ async def connect_to_chat_direct(message, strings):
 @get_strings_dec('connections')
 @chat_connection()
 async def connect_chat_keyboard(message, strings, chat):
+    connected_data = await get_connection_data(message.from_user.id)
+    if not connected_data:
+        return await message.reply(strings['u_wasnt_connected'])
+
     if chat['status'] != 'private':
         text = strings['connected_chat'].format(chat_name=chat['chat_title'])
+    elif 'command' in connected_data:
+        if chat := await db.chat_list.find_one({'chat_id': connected_data['chat_id']}):
+            chat_title = chat['chat_title']
+        else:
+            chat_title = connected_data['chat_id']
+        text = strings['connected_chat:cmds'].format(
+            chat_name=chat_title,
+            # disconnect is builtin command, should not be shown
+            commands=", ".join(f"<code>/{cmd}</code>" for cmd in connected_data['command'] if cmd != "disconnect")
+        )
+
     else:
         text = ''
 
     text += strings['select_chat_to_connect']
     markup = InlineKeyboardMarkup(row_width=1)
 
-    if connected := await db.connections.find_one({'user_id': message.from_user.id}, {'history': {'$slice': -3}}):
-        for chat_id in reversed(connected['history']):
+    for chat_id in reversed(connected_data['history'][-3:]):
             chat = await db.chat_list.find_one({'chat_id': chat_id})
             markup.insert(InlineKeyboardButton(
                 chat['chat_title'],
@@ -126,11 +146,24 @@ async def connect_to_chat_from_arg(message, chat, strings):
 @register(cmds='disconnect', only_pm=True)
 @get_strings_dec('connections')
 async def disconnect_from_chat_direct(message, strings):
-    if (data := await db.connections.find_one({'user_id': message.from_user.id})) and 'chat_id' in data:
+    if (data := await get_connection_data(message.from_user.id)) and 'chat_id' in data:
         chat = await db.chat_list.find_one({'chat_id': data['chat_id']})
         user_id = message.from_user.id
         await set_connected_chat(user_id, None)
         await message.reply(strings['disconnected'].format(chat_name=chat['chat_title']))
+
+@register(regexp="anon_conn_cb", f='cb')
+async def connect_anon_admins(event: CallbackQuery):
+    if not await is_user_admin(event.message.chat.id, event.from_user.id):
+        return
+
+    if event.message.chat.id not in (data := await db.user_list.find_one({"user_id": event.from_user.id}))['chats']:
+        await db.user_list.update_one(
+            {"_id": data['_id']},
+            {"$addToSet": {"chats": event.message.chat.id}}
+        )
+    return await event.answer(url=await get_start_link(f"btn_connect_start_{event.message.chat.id}"))
+
 
 
 @register(cmds='allowusersconnect')

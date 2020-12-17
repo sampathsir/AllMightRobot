@@ -18,7 +18,7 @@
 
 from contextlib import suppress
 
-from AllMightRobot import OPERATORS
+from AllMightRobot.modules.utils.user_details import is_user_admin
 from AllMightRobot.services.mongo import db
 from AllMightRobot.utils.logger import log
 
@@ -44,7 +44,7 @@ def disableable_dec(command):
                     cmd = aliases[0]
 
             check = await db.disabled.find_one({'chat_id': chat_id, 'cmds': {'$in': [cmd]}})
-            if check and user_id not in OPERATORS:
+            if check and not await is_user_admin(chat_id, user_id):
                 return
             return await func(*args, **kwargs)
 

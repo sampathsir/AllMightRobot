@@ -21,12 +21,14 @@ import re
 import sys
 from datetime import datetime
 
+from aiogram.types import Message
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils import markdown
 from babel.dates import format_date, format_time, format_datetime
-from telethon.errors import (ButtonUrlInvalidError, MediaCaptionTooLongError, MessageEmptyError, UserIsBlockedError,
-                        MediaEmptyError, BadRequestError, ChatWriteForbiddenError)
-
+from telethon.errors import (
+    ButtonUrlInvalidError, MessageEmptyError, MediaEmptyError,
+    BadRequestError
+)
 from telethon.tl.custom import Button
 
 import AllMightRobot.modules.utils.tmarkdown as tmarkdown
@@ -36,6 +38,7 @@ from .language import get_chat_lang
 from .message import get_args
 from .tmarkdown import tbold, titalic, tpre, tcode, tlink, tstrikethrough, tunderline
 from .user_details import get_user_link
+from ...utils.logger import log
 
 BUTTONS = {}
 
@@ -287,6 +290,7 @@ async def t_unparse_note_item(message, db_item, chat_id, noformat=None, event=No
     else:
         pm = True if message.chat.type == 'private' else False
         text, markup = button_parser(chat_id, text, pm=pm)
+
         if not text and not file_id:
             text = ('#' + db_item['names'][0]) if 'names' in db_item else '404'
 
@@ -309,33 +313,43 @@ async def t_unparse_note_item(message, db_item, chat_id, noformat=None, event=No
 
 
 async def send_note(send_id, text, **kwargs):
+    if text:
+        text = text[:4090]
+
     if 'parse_mode' in kwargs and kwargs['parse_mode'] == 'md':
         kwargs['parse_mode'] = tmarkdown
+
     try:
         return await tbot.send_message(send_id, text, **kwargs)
+
     except (ButtonUrlInvalidError, MessageEmptyError, MediaEmptyError):
-        text = 'I found this note invalid! Please update it (read Wiki).'
-        return await tbot.send_message(send_id, text)
-    except MediaCaptionTooLongError:
-        text = textwrap.shorten(text, width=1000)
-        return await tbot.send_message(send_id, text, **kwargs)
+        return await tbot.send_message(send_id, 'I found this note invalid! Please update it (read Wiki).')
+
     except BadRequestError:  # if reply message deleted
         del kwargs['reply_to']
         return await tbot.send_message(send_id, text, **kwargs)
-    except (ChatWriteForbiddenError, UserIsBlockedError, ValueError):
-        pass
+
+    except Exception as err:
+        log.error("Something happened on sending note", exc_info=err)
 
 
 def button_parser(chat_id, texts, pm=False, aio=False, row_width=None):
     buttons = InlineKeyboardMarkup(row_width=row_width) if aio else []
-    pattern = r'\[(.+?)\]\((button|btn)(.+?)(:.+?|)(:same|)\)(\n|)'
+    pattern = r'\[(.+?)\]\((button|btn|#)(.+?)(:.+?|)(:same|)\)(\n|)'
     raw_buttons = re.findall(pattern, texts)
     text = re.sub(pattern, '', texts)
     btn = None
     for raw_button in raw_buttons:
         name = raw_button[0]
-        action = raw_button[2]
-        argument = raw_button[3][1:].lower().replace('`', '') if raw_button[3] else ''
+        action = raw_button[1] if raw_button[1] not in ('button', 'btn') else raw_button[2]
+
+        if raw_button[3]:
+            argument = raw_button[3][1:].lower().replace('`', '')
+        elif action in ('#'):
+            argument = raw_button[2]
+            print(raw_button[2])
+        else:
+            argument = ''
 
         if action in BUTTONS.keys():
             cb = BUTTONS[action]
@@ -373,13 +387,14 @@ def button_parser(chat_id, texts, pm=False, aio=False, row_width=None):
                 text += f'\n[{name}].(btn{action})'
                 continue
 
-        if aio:
-            buttons.insert(btn) if raw_button[4] else buttons.add(btn)
-        else:
-            if len(buttons) < 1 and raw_button[4]:
-                buttons.add(btn) if aio else buttons.append([btn])
+        if btn:
+            if aio:
+                buttons.insert(btn) if raw_button[4] else buttons.add(btn)
             else:
-                buttons[-1].append(btn) if raw_button[4] else buttons.append([btn])
+                if len(buttons) < 1 and raw_button[4]:
+                    buttons.add(btn) if aio else buttons.append([btn])
+                else:
+                    buttons[-1].append(btn) if raw_button[4] else buttons.append([btn])
 
     if not aio and len(buttons) == 0:
         buttons = None
@@ -390,7 +405,7 @@ def button_parser(chat_id, texts, pm=False, aio=False, row_width=None):
     return text, buttons
 
 
-async def vars_parser(text, message, chat_id, md=False, event=None, user=None):
+async def vars_parser(text, message, chat_id, md=False, event: Message = None, user=None):
     if event is None:
         event = message
 
@@ -405,11 +420,14 @@ async def vars_parser(text, message, chat_id, md=False, event=None, user=None):
     user_id = ([user.id for user in event.new_chat_members][0]
                if 'new_chat_members' in event and event.new_chat_members != [] else user.id)
     mention = await get_user_link(user_id, md=md)
-    username = ('@' + str(event.new_chat_members[0].username)
-                if 'new_chat_members' in event and event.new_chat_members != [] and event.new_chat_members[0].username
-                   is not None
-                else '@' + user.username
-                if user.username is not None else mention)
+
+    if hasattr(event, 'new_chat_members') and event.new_chat_members and event.new_chat_members[0].username:
+        username = "@" + event.new_chat_members[0].username
+    elif user.username:
+        username = "@" + user.username
+    else:
+        username = mention
+
     chat_id = message.chat.id
     chat_name = html.escape(message.chat.title or 'Local', quote=False)
     chat_nick = message.chat.username or chat_name

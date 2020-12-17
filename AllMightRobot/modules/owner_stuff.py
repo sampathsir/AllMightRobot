@@ -23,14 +23,12 @@ import sys
 import requests
 import ujson
 
-from AllMightRobot import OWNER_ID, OPERATORS, AllMight_VERSION, DEVS
+from AllMightRobot import OWNER_ID, OPERATORS, AllMight_VERSION, DEVS, dp
 from AllMightRobot.decorator import REGISTRED_COMMANDS, COMMANDS_ALIASES, register
 from AllMightRobot.modules import LOADED_MODULES
 from AllMightRobot.services.mongo import db, mongodb
-from AllMightRobot.services.quart import quart
 from AllMightRobot.services.redis import redis
 from AllMightRobot.services.telethon import tbot
-from .utils.api import html_white_text
 from .utils.covert import convert_size
 from .utils.language import get_strings_dec
 from .utils.message import need_args_dec
@@ -87,6 +85,7 @@ async def cmd_term(message):
 @need_args_dec()
 async def sbroadcast(message):
     data = await get_parsed_note_list(message, split_args=-1)
+    dp.register_message_handler(check_message_for_smartbroadcast)
 
     await db.sbroadcast.drop({})
 
@@ -99,6 +98,10 @@ async def sbroadcast(message):
     await db.sbroadcast.insert_one(data)
     await message.reply("Smart broadcast planned for <code>{}</code> chats".format(len(chats)))
 
+@register(cmds="continuebroadcast", is_owner=True)
+async def continue_sbroadcast(message):
+    dp.register_message_handler(check_message_for_smartbroadcast)
+    return await message.reply("Re-registered the broadcast handler.")
 
 @register(cmds="stopsbroadcast", is_owner=True)
 async def stop_sbroadcast(message):
@@ -111,14 +114,12 @@ async def stop_sbroadcast(message):
 
 
 # Check on smart broadcast
-@register()
 async def check_message_for_smartbroadcast(message):
     chat_id = message.chat.id
     if not (db_item := await db.sbroadcast.find_one({'chats': {'$in': [chat_id]}})):
         return
 
     text, kwargs = await t_unparse_note_item(message, db_item, chat_id)
-    kwargs['reply_to'] = message.message_id
 
     await send_note(chat_id, text, **kwargs)
 
@@ -167,7 +168,7 @@ async def upload_logs(message):
 async def crash(message):
     test = 2 / 0
     print(test)
-    
+
 @register(cmds="restart", is_owner=True, is_dev=True)
 async def restart_bot(message):
     await message.reply("Allmight will be restarted.")
@@ -191,17 +192,6 @@ async def stats(message):
         text += await module.__stats__()
 
     await message.reply(text)
-
-
-@quart.route('/stats')
-async def api_stats():
-    text = f"<b>AllMight {AllMight_VERSION} stats</b>\n"
-
-    for module in [m for m in LOADED_MODULES if hasattr(m, '__stats__')]:
-        if txt := await module.__stats__():
-            text += txt
-
-    return html_white_text(text)
 
 
 async def __stats__():
