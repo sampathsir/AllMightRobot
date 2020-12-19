@@ -73,7 +73,7 @@ STRINGS:
     #/addfilter
     anon_detected: Being anonymous admin, you cannot add new filters, use connections instead.
     regex_too_slow: "Your regex pattern is matching too slow (more than the half of second), it can't be added!"
-    cancel_btn: "🛑 Cancel"
+    cancel_btn: "🛑 ביטול"
     adding_filter: |
       Adding filter <code>{handler}</code> in <b>{chat_name}</b>
       Select action below:
@@ -90,7 +90,7 @@ STRINGS:
     not_chat_creator: Only chat creators can use this command!
     delall_header: This would delete all filters in this chat. This IS irreversible.
     confirm_yes: '⚠ Delete all'
-    confirm_no: '❌ Cancel'
+    confirm_no: '❌ ביטול'
     delall_success: Successfully deleted all ({count}) filters in this chat!
   warns:
     #/warn
