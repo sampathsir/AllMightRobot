@@ -94,7 +94,7 @@ STRINGS:
     delall_success: Successfully deleted all ({count}) filters in this chat!
   warns:
     #/warn
-    warn_sofi: "Haha no way to warn myself!"
+    warn_sofi: "אני לא הולך לתת אזהרה לעצמי!"
     warn_self: "Do you wanna warn yourself? Just leave the chat then."
     warn_admin: "Well.. you are wrong. You can't warn an admin."
     warn: "{admin} has warned {user} in <b>{chat_name}</b>\n"
@@ -141,8 +141,8 @@ STRINGS:
     fast_purge_done: "<b>Fast purge completed!</b>\nThis message will be removed in 5 seconds."
     purge_user_done: "All messages from {user} were successfully deleted!"
   misc:
-    your_id: "Your ID: <code>{id}</code>\n"
-    chat_id: "Group ID: <code>{id}</code>\n"
+    your_id: "הID שלך הוא: <code>{id}</code>\n"
+    chat_id: "הID של הקבוצה הוא: <code>{id}</code>\n"
     user_id: "{user}'s ID: <code>{id}</code>\n"
     conn_chat_id: "Current connected chat ID: <code>{id}</code>"
     help_btn: "לחץ כאן לעזרה!"
@@ -163,10 +163,10 @@ STRINGS:
     cant_get_user: "I couldn't get the user! If you mind, please reply to his message and try again."
     emoji_not_allowed: "I'm sorry, but admin roles can't have emojis 😞"
   pm_menu:
-    start_hi_group: 'Hey there! My name is AllMight'
+    start_hi_group: 'שלום! השם שלי הוא AllMight'
     start_hi: "Hey there! My name is AllMight, I help you manage your group in an efficient way!"
     btn_help: "❔ עזרה"
-    btn_add: "➕ Add me to your chat"
+    btn_add: "➕ הוסף אותי לקבוצה שלך"
     btn_lang: "🇮🇱 שפה"
     btn_chat: "👥 AllMight הקבוצה"
     btn_channel: "📡 AllMight ערוץ העדכונים"
