@@ -10,12 +10,12 @@ from .utils.message import need_args_dec, get_args_str
 
 @register(cmds='anime')
 @disableable_dec('anime')
-async def anime(message): 
-  query = get_args_str(message).lower() 
-  headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0"} 
-  query.replace('', '%20') 
-  url = f'https://kitsu.io/api/edge/anime?filter%5Btext%5D={urlencode(query)}' 
-  session = aiohttp.ClientSession() 
+async def anime(message):
+  query = get_args_str(message).lower()
+  headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0"}
+  query.replace('', '%20')
+  url = f'https://kitsu.io/api/edge/anime?filter%5Btext%5D={urlencode(query)}'
+  session = aiohttp.ClientSession()
   async with session.get(url) as resp:
     a = await resp.json()
     if 'data' in a.keys():
@@ -38,3 +38,15 @@ async def anime(message):
          await message.reply_photo(pic, caption=info, reply_markup=link_btn)
       else:
          await message.reply_text(info, reply_markup=link_btn)
+
+
+
+__mod_name__ = "Anime"
+
+__help__ = """
+Get information about anime or anime characters.
+<b>Available commands:</b>
+- /anime: search anime on Kitsu.
+- /sanime: search anime on MyAnimeList.
+- /character: search anime character on MyAnimeList.
+"""
