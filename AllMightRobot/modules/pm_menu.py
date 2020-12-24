@@ -35,10 +35,12 @@ from .language import select_lang_keyboard
 
 helpmenu_cb = CallbackData('helpmenu', 'mod')
 
+
 def help_markup(modules):
     markup = InlineKeyboardMarkup()
     for module in modules:
-        markup.insert(InlineKeyboardButton(module, callback_data=helpmenu_cb.new(mod = module)))
+        markup.insert(InlineKeyboardButton(
+            module, callback_data=helpmenu_cb.new(mod=module)))
     return markup
 
 
@@ -52,7 +54,6 @@ async def start_group_cmd(message, strings):
 @register(cmds='start', no_args=True, only_pm=True)
 async def start_cmd(message):
     await get_start_func(message)
-
 
 @get_strings_dec('pm_menu')
 async def get_start_func(message, strings, edit=False):
@@ -73,9 +74,10 @@ async def get_start_func(message, strings, edit=False):
 @get_strings_dec('pm_menu')
 async def help_cb(event, strings):
     button = help_markup(MOD_HELP)
-    button.add(InlineKeyboardButton(strings['back'], callback_data='go_to_start'))
+    button.add(InlineKeyboardButton(
+        strings['back'], callback_data='go_to_start'))
     with suppress(MessageNotModified):
-        await event.message.edit_text("This is help. You get help.", reply_markup=button)
+        await event.message.edit_text(strings['help_header'], reply_markup=button)
 
 
 @register(regexp='lang_btn', f='cb')
@@ -88,12 +90,25 @@ async def back_btn(event):
     await get_start_func(event, edit=True)
 
 
-@register(cmds='help')
+@register(cmds='help', only_pm=True)
 @disableable_dec('help')
 @get_strings_dec('pm_menu')
 async def help_cmd(message, strings):
     button = help_markup(MOD_HELP)
-    await message.reply("This is help. You get help.", reply_markup=button)
+    button.add(InlineKeyboardButton(
+        strings['back'], callback_data='go_to_start'))
+    await message.reply(strings['help_header'], reply_markup=button)
+
+
+@register(cmds='help', only_groups=True)
+@disableable_dec('help')
+@get_strings_dec('pm_menu')
+async def help_cmd(message, strings):
+    text = (strings['btn_group_help'])
+    button = InlineKeyboardMarkup().add(InlineKeyboardButton(
+        text=text, url=f'https://telegram.me/{BOT_USERNAME}?start'))
+    await message.reply(strings['help_header'], reply_markup=button)
+
 
 @register(helpmenu_cb.filter(), f='cb', allow_kwargs=True)
 async def helpmenu_callback(query, callback_data=None, **kwargs):
@@ -101,8 +116,10 @@ async def helpmenu_callback(query, callback_data=None, **kwargs):
     if not mod in MOD_HELP:
         await query.answer()
         return
-    msg = f"Help for *{mod}*\n\n"
+    msg = f"Help for <b>{mod}</b> module:\n"
     msg += f"{MOD_HELP[mod]}"
+    button = InlineKeyboardMarkup().add(
+        InlineKeyboardButton(text='⬅️ Back', callback_data='get_help'))
     with suppress(MessageNotModified):
-        await query.message.edit_text(msg, parse_mode = 'markdown')
+        await query.message.edit_text(msg, disable_web_page_preview=True, reply_markup=button)
         await query.answer('Help for ' + mod)
