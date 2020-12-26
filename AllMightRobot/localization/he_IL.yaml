@@ -95,9 +95,9 @@ STRINGS:
   warns:
     #/warn
     warn_sofi: "אני לא הולך לתת אזהרה לעצמי!"
-    warn_self: "Do you wanna warn yourself? Just leave the chat then."
-    warn_admin: "Well.. you are wrong. You can't warn an admin."
-    warn: "{admin} has warned {user} in <b>{chat_name}</b>\n"
+    warn_self: "רוצה להזהיר את עצמך? פשוט תצא/תצאי מהצ'אט."
+    warn_admin: "טוב.. כאן הטעות שלך. אינך יכול להזהיר אדמין."
+    warn: "{admin} הזהיר את {user} ב <b>{chat_name}</b>\n"
     warn_bun: "Warnings has been exceeded! {user} has been banned!"
     warn_num: "Warns: {curr_warns}/{max_warns}\n"
     warn_rsn: "סיבה: <code>{reason}</code>\n"
@@ -105,15 +105,15 @@ STRINGS:
     "max_warn_exceeded:tmute": Warnings has been exceeded! {user} has been tmuted for {time}!
     #warn rmv callback
     warn_no_admin_alert: "⚠ You are NOT admin to remove warn!"
-    warn_btn_rmvl_success: "✅ Warn removed by {admin} !"
+    warn_btn_rmvl_success: "✅ האזהרה נמחקה על ידי {admin} !"
     #/warns
-    warns_header: "Here are your warns in this chat \n\n"
+    warns_header: "הנה האזהרות שלך בצ'אט זה\n\n"
     warns: "{count} : <code>{reason}</code> by {admin}\n"
-    no_warns: "Well, {user} doesn't have any warns."
+    no_warns: "ל{user} אין אזהרות."
     #/warnlimit
     warn_limit: "Warn limit in <b>{chat_name}</b> is currently: <code>{num}</code>"
-    warnlimit_short: 'Warnlimit should be at least 2!'
-    warnlimit_long: 'Warnlimit should be shorter than 1 000!'
+    warnlimit_short: 'מגבלת האזהרות חייבת להיות לפחות 2!'
+    warnlimit_long: 'מגבלת האזהרות לא יכולה להיות גדולה מ1000!'
     warnlimit_updated: '✅ Warnlimit has successfully updated to {num}'
     #/delwarns
     purged_warns: "{admin} reset <code>{num}</code> warns of {user} in <b>{chat_title}</b>!"
