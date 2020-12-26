@@ -14,13 +14,13 @@ STRINGS:
     notename_cant_contain: "Note name can't contain \"<code>{symbol}</code>\"!"
     #/get
     cant_find_note: I can't find this note in <b>{chat_name}</b>!
-    no_note: "Can't find that note."
+    no_note: "ההערה לא נמצאה."
     no_notes_pattern: "No notes found by pattern <code>%s</code>"
     u_mean: "\nDid you mean <code>#{note_name}</code>?"
     #/notes
     notelist_no_notes: "There aren't any notes in <b>{chat_title}</b>!"
     notelist_header: "<b>Notes in {chat_name}</b>:"
-    notes_in_private: "Click below button to get notes list."
+    notes_in_private: "לחצו על כפתור זה בשביל לקבל את רשימת ההערות."
     notelist_search: |
       <b>Pattern:</b> <code>{request}</code>
       <b>Matched notes:</b>
