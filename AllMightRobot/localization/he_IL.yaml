@@ -19,11 +19,11 @@ STRINGS:
     u_mean: "\nהאם התכוונת <code>#{note_name}</code>?"
     #/notes
     notelist_no_notes: "אין הערות שמורות ב<b>{chat_title}</b>!"
-    notelist_header: "<b>Notes in {chat_name}</b>:"
+    notelist_header: "<b>הערות שמורות ב{chat_name}</b>:"
     notes_in_private: "לחצו על כפתור זה בשביל לקבל את רשימת ההערות."
     notelist_search: |
-      <b>Pattern:</b> <code>{request}</code>
-      <b>Matched notes:</b>
+      <b>תבנית:</b> <code>{request}</code>
+      <b>הערות מתאימות:</b>
     #/clear
     note_removed: "ההערה <code>#{note_name}</code> הוסרה ב<b>{chat_name}</b>!"
     note_removed_multiple: |
@@ -46,7 +46,7 @@ STRINGS:
     note_info_content: "תוכן הקיצור: %s\n"
     note_info_parsing: "Parse mode: <code>%s</code>\n"
     note_info_created: "Was created in: <code>{date}</code> by {user}\n"
-    note_info_updated: "Last updated in: <code>{date}</code> by {user}\n"
+    note_info_updated: "עודכן לאחרונה ב:<code>{date}</code> על ידי {user}\n"
     user_blocked: "תשלח לי /start בפרטי!"
     #/privatenotes
     private_notes_false_args: "You have 2 options <code>Disable</code> and <code>Enable</code> !"
@@ -54,7 +54,7 @@ STRINGS:
     current_state_info: "Currently private note is {state} in {chat} ! "
     enabled_successfully: "Private notes are <b>Enabled</b> in %s successfully!"
     disabled_successfully: "Private notes are <b>Disabled</b> in %s successfully!"
-    not_enabled: "Private notes are not enabled to disable."
+    not_enabled: "הערות פרטיות לא מאופשרות כדי להשבית."
     privatenotes_notif: "You have been successfully connected to <b>{chat}</b> notes! To disconnect please use command <code>/disconnect</code> !"
     enabled: 'מופעל'
     disabled: 'מושבת'
@@ -89,7 +89,7 @@ STRINGS:
     #/delfilters or /delallfilters
     not_chat_creator: Only chat creators can use this command!
     delall_header: This would delete all filters in this chat. This IS irreversible.
-    confirm_yes: '⚠ Delete all'
+    confirm_yes: '⚠ מחק הכל'
     confirm_no: '❌ ביטול'
     delall_success: Successfully deleted all ({count}) filters in this chat!
   warns:
