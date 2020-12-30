@@ -87,11 +87,11 @@ STRINGS:
       I have found many filters with handler '<code>{handler}</code>'.
       Please select one to remove:
     #/delfilters or /delallfilters
-    not_chat_creator: Only chat creators can use this command!
+    not_chat_creator: רק יוצרי הקבוצה יכולים להשתמש בפקודה זו!
     delall_header: This would delete all filters in this chat. This IS irreversible.
     confirm_yes: '⚠ מחק הכל'
     confirm_no: '❌ ביטול'
-    delall_success: Successfully deleted all ({count}) filters in this chat!
+    delall_success: כל ה ({count}) פילטרים נמחקו בהצלחה!
   warns:
     #/warn
     warn_sofi: "אני לא הולך לתת אזהרה לעצמי!"
@@ -114,12 +114,12 @@ STRINGS:
     warn_limit: "Warn limit in <b>{chat_name}</b> is currently: <code>{num}</code>"
     warnlimit_short: 'מגבלת האזהרות חייבת להיות לפחות 2!'
     warnlimit_long: 'מגבלת האזהרות לא יכולה להיות גדולה מ1000!'
-    warnlimit_updated: '✅ Warnlimit has successfully updated to {num}'
+    warnlimit_updated: '✅ מספר האזהרות המקסימלי עודכן ל {num}'
     #/delwarns
     purged_warns: "{admin} reset <code>{num}</code> warns of {user} in <b>{chat_title}</b>!"
-    usr_no_wrn: "{user} doesn't have any warns to reset."
-    rst_wrn_sofi: 'AllMight never had warns to reset.'
-    not_digit: Warnlimits should be digits!
+    usr_no_wrn: "למשתמש {user} אין אזהרות כלל לאיפוס."
+    rst_wrn_sofi: 'לAllMight לא היו אזהרות לאיפוס.'
+    not_digit: מגבלת האזהרות חייבת להיות בספרות!
     #/warnmode
     same_mode: This is the current mode! How can I change it?
     no_time: For selecting mode 'tmute' you have to mention time!
@@ -204,11 +204,11 @@ STRINGS:
   feds:
     #decorators
     need_fed_admin: "את/ה לא אדמין בארגון <b>{name}</b>"
-    need_fed_owner: "You are not an owner of <b>{name}</b> Federation"
-    cant_get_user: "Sorry, I can't get that user, try using user ID"
+    need_fed_owner: "את/ה לא הבעלים של הארגון <b>{name}</b>"
+    cant_get_user: "סליחה, אני לא יכול למצוא את המשתמש הזה, נסה להשתמש בuser ID"
     #/fnew
-    fed_name_long: "Federation name can't be longer than 60 symbols!"
-    can_only_1_fed: "1 user can create only 1 Federation, please remove one."
+    fed_name_long: "שם הארגון לא יכול לעלות על 60 תווים!"
+    can_only_1_fed: "משתמש אחד יכול ליצור רק ארגון אחד, בבקשה תמחק אחד."
     name_not_avaible: "Federation with name <code>{name}</code> already exits! Please use another name."
     created_fed: |
       Congrats, you have successfully created Federation.
