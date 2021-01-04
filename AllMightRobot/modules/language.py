@@ -130,3 +130,15 @@ async def __import__(chat_id, data):
     if data not in LANGUAGES:
         return
     await db.lang.update_one({'chat_id': chat_id}, {"$set": {'lang': data}}, upsert=True)
+
+
+__mod_name__ = "Languages"
+
+__help__ = """
+<b>Available commands:</b>
+- /lang: Shows a list of avaible languages
+- /lang (language codename): Sets a language
+
+<b>Example:</b> <code>/lang</code>
+AllMight will send you bunch of inline buttons where you can select your prefered language interatively without any hassles!
+"""
