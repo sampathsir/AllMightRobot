@@ -172,8 +172,9 @@ STRINGS:
     btn_channel: "📡novinky o AllMight"
     back: Zpět
     #/help
-    help_header: Ahoj! Podívejte se na naši wiki pro nápovědu
+    help_header: "Hey! My name is <b>AllMight</b>. I am a group management bot, here to help you get around and keep the order in your groups!\nI have lots of handy features, such as flood control, a warning system, a note keeping system, and even predetermined replies on certain keywords."
     click_btn: Klikni zde
+    btn_group_help: "Click me for help!"
   disable:
     #/disableable
     disablable: "<b>příkazy které je možno zakázat:</b>\n"
