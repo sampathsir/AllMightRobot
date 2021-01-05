@@ -1,4 +1,4 @@
-# Copyright (C) 2018 - 2020 MrYacha. All rights reserved. Source code available under the AGPL.
+﻿# Copyright (C) 2018 - 2020 MrYacha. All rights reserved. Source code available under the AGPL.
 # Copyright (C) 2019 Aiogram
 
 #
@@ -49,12 +49,19 @@ async def pin_message(message, strings):
     msg = message.reply_to_message.message_id
     arg = get_arg(message).lower()
 
-    notify = False
+    dnd = True
     loud = ['loud', 'notify']
     if arg in loud:
-        notify = True
+        dnd = False
 
     try:
-        await bot.pin_chat_message(message.chat.id, msg, disable_notification=notify)
+        await bot.pin_chat_message(message.chat.id, msg, disable_notification=dnd)
     except BadRequest:
         await message.reply(strings['chat_not_modified_pin'])
+
+__mod_name__ = "Pins"
+
+__help__ = """
+• /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifs to users
+• /unpin: unpins the currently pinned message
+"""

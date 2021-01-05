@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import MessageNotModified
 from aiogram.types.inline_keyboard import (
     InlineKeyboardMarkup,
@@ -25,11 +26,22 @@ from aiogram.types.inline_keyboard import (
 )
 
 from contextlib import suppress
-from .language import select_lang_keyboard
 from AllMightRobot import BOT_USERNAME
 from AllMightRobot.decorator import register
-from AllMightRobot.modules.utils.disable import disableable_dec
+from . import MOD_HELP
+from .utils.disable import disableable_dec
 from .utils.language import get_strings_dec
+from .language import select_lang_keyboard
+
+helpmenu_cb = CallbackData('helpmenu', 'mod')
+
+
+def help_markup(modules):
+    markup = InlineKeyboardMarkup()
+    for module in modules:
+        markup.insert(InlineKeyboardButton(
+            module, callback_data=helpmenu_cb.new(mod=module)))
+    return markup
 
 
 @register(cmds='start', no_args=True, only_groups=True)
@@ -42,7 +54,6 @@ async def start_group_cmd(message, strings):
 @register(cmds='start', no_args=True, only_pm=True)
 async def start_cmd(message):
     await get_start_func(message)
-
 
 @get_strings_dec('pm_menu')
 async def get_start_func(message, strings, edit=False):
@@ -62,9 +73,9 @@ async def get_start_func(message, strings, edit=False):
 @register(regexp='get_help', f='cb')
 @get_strings_dec('pm_menu')
 async def help_cb(event, strings):
-    button = InlineKeyboardMarkup()
-    button.add(InlineKeyboardButton(strings['click_btn'], url='https://github.com/AnimeKaizoku/AllMightRobot/wiki'))
-    button.add(InlineKeyboardButton(strings['back'], callback_data='go_to_start'))
+    button = help_markup(MOD_HELP)
+    button.add(InlineKeyboardButton(
+        strings['back'], callback_data='go_to_start'))
     with suppress(MessageNotModified):
         await event.message.edit_text(strings['help_header'], reply_markup=button)
 
@@ -79,11 +90,36 @@ async def back_btn(event):
     await get_start_func(event, edit=True)
 
 
-@register(cmds='help')
+@register(cmds='help', only_pm=True)
 @disableable_dec('help')
 @get_strings_dec('pm_menu')
 async def help_cmd(message, strings):
-    button = InlineKeyboardMarkup().add(InlineKeyboardButton(
-        strings['click_btn'], url='https://github.com/AnimeKaizoku/AllMightRobot/wiki'
-    ))
+    button = help_markup(MOD_HELP)
+    button.add(InlineKeyboardButton(
+        strings['back'], callback_data='go_to_start'))
     await message.reply(strings['help_header'], reply_markup=button)
+
+
+@register(cmds='help', only_groups=True)
+@disableable_dec('help')
+@get_strings_dec('pm_menu')
+async def help_cmd(message, strings):
+    text = (strings['btn_group_help'])
+    button = InlineKeyboardMarkup().add(InlineKeyboardButton(
+        text=text, url=f'https://telegram.me/{BOT_USERNAME}?start'))
+    await message.reply(strings['help_header'], reply_markup=button)
+
+
+@register(helpmenu_cb.filter(), f='cb', allow_kwargs=True)
+async def helpmenu_callback(query, callback_data=None, **kwargs):
+    mod = callback_data['mod']
+    if not mod in MOD_HELP:
+        await query.answer()
+        return
+    msg = f"Help for <b>{mod}</b> module:\n"
+    msg += f"{MOD_HELP[mod]}"
+    button = InlineKeyboardMarkup().add(
+        InlineKeyboardButton(text='⬅️ Back', callback_data='get_help'))
+    with suppress(MessageNotModified):
+        await query.message.edit_text(msg, disable_web_page_preview=True, reply_markup=button)
+        await query.answer('Help for ' + mod)

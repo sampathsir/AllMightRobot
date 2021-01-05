@@ -22,7 +22,7 @@ import datetime  # noqa: F401
 from contextlib import suppress
 
 from aiogram.utils.exceptions import MessageNotModified
-from babel.dates import format_datetime, format_timedelta
+from babel.dates import format_timedelta
 
 from AllMightRobot import BOT_ID, bot
 from AllMightRobot.decorator import register
@@ -225,12 +225,12 @@ async def ban_user_cmd(message, chat, user, args, strings):
     if curr_cmd in ('tban', 'stban'):
         if args is not None and len(args := args.split()) > 0:
             try:
-                until_date, unit = convert_time(args[0])
+                until_date = convert_time(args[0])
             except (InvalidTimeUnit, TypeError, ValueError):
                 await message.reply(strings['invalid_time'])
                 return
 
-            text += strings['on_time'] % format_datetime(until_date, locale=strings['language_info']['babel'])
+            text += strings['on_time'] % format_timedelta(until_date, locale=strings['language_info']['babel'])
 
             # Add reason
             if len(args) > 1:
@@ -430,3 +430,34 @@ __filters__ = {
         'handle': filter_handle_kick
     }
 }
+
+
+
+__mod_name__ = "Restrictions"
+
+__help__ = """
+General admin's rights is restrict users and control their rules with this module you can easely do it.
+
+<b>Available commands:</b>
+<b>Kicks:</b>
+- /kick: Kicks a user
+- /skick: Silently kicks
+
+<b>Mutes:</b>
+- /mute: Mutes a user
+- /smute: Silently mutes
+- /tmute (time): Temprotary mute a user
+- /stmute (time): Silently temprotary mute a user
+- /unmute: Unmutes the user
+
+<b>Bans:</b>
+- /ban: Bans a user
+- /sban: Silently bans
+- /tban (time): Temprotary ban a user
+-/stban (time): Silently temprotary ban a user
+- /unban: Unbans the user
+
+<b>Examples:</b>
+<code>- Mute a user for two hours.
+-> /tmute @username 2h</code>
+"""
