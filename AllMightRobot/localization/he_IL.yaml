@@ -31,10 +31,10 @@ STRINGS:
       <b>Removed:</b><code>{removed}</code>
     not_removed_multiple: "<b>Not removed:</b><code>{not_removed}</code>"
     #/clearall
-    clear_all_text: "This will remove all notes from {chat_name}. Are you sure?"
+    clear_all_text: "זה ימחק את כל התזכורות מ{chat_name}. האם את\\ה בטוח\\ה?"
     clearall_btn_yes: "כן, תמחק את כל הקיצורים בצ'אט זה!"
     clearall_btn_no: "לא!"
-    clearall_done: "All (<code>{num}</code>) notes in {chat_name} were removed!"
+    clearall_done: "כל (<code>{num}</code>) ההערות ב{chat_name} הוסרו!"
     #/search
     search_header: |
       <b>Search request in {chat_name}</b>:
@@ -50,7 +50,7 @@ STRINGS:
     user_blocked: "תשלח לי /start בפרטי!"
     #/privatenotes
     private_notes_false_args: "You have 2 options <code>Disable</code> and <code>Enable</code> !"
-    already_enabled: "Private notes are already enabled in %s"
+    already_enabled: "תזכורות פרטיות כבר מאופשרות ב%s"
     current_state_info: "Currently private note is {state} in {chat} ! "
     enabled_successfully: "Private notes are <b>Enabled</b> in %s successfully!"
     disabled_successfully: "Private notes are <b>Disabled</b> in %s successfully!"
@@ -69,7 +69,7 @@ STRINGS:
   #delmsg_no_arg: "deletemsg button can contain only 'admin' or 'user' argument!"
   #bot_msg: "I'm sorry, I am not able to get this message, probably this a other bot's message, so I can't save it."
   filters:
-    no_filters_found: "No filters was found in <b>{chat_name}</b>!"
+    no_filters_found: "לא נמצאו פילטרים ב <b>{chat_name}</b>!"
     #/addfilter
     anon_detected: Being anonymous admin, you cannot add new filters, use connections instead.
     regex_too_slow: "Your regex pattern is matching too slow (more than the half of second), it can't be added!"
@@ -121,7 +121,7 @@ STRINGS:
     rst_wrn_sofi: 'לAllMight לא היו אזהרות לאיפוס.'
     not_digit: מגבלת האזהרות חייבת להיות בספרות!
     #/warnmode
-    same_mode: This is the current mode! How can I change it?
+    same_mode: זה המצב הרגיל! איך אני יכול לשנות זאת?
     no_time: For selecting mode 'tmute' you have to mention time!
     invalid_time: זמן לא חוקי!
     warnmode_success: Warn mode of <b>%s</b> has successfully changed to <b>%s</b> !
@@ -129,35 +129,35 @@ STRINGS:
       These are the available options:
       <code>%s</code>
     mode_info: |
-      Current mode in this chat is <b>%s</b>.
+      המצב כרגע בצ'אט זה הוא <b>%s</b>.
     banned: נחסם
     muted: הושתק
     filters_title: הזהר את המשתמש
-    filter_handle_rsn: Automated filter action!
+    filter_handle_rsn: פעולת פילטר אוטומטית!
   msg_deleting:
-    no_rights_purge: "You don't have enough rights to purge in this group!"
-    reply_to_msg: "Reply to a message to delete!"
+    no_rights_purge: "איך לך מספיק זכויות כדי לטהר בקבוצה זו!"
+    reply_to_msg: "תגיב להודעה כדי למחוק!"
     purge_error: "I can't continue purge, mostly because you started purge from a message that was sent older than 2 days."
     fast_purge_done: "<b>Fast purge completed!</b>\nThis message will be removed in 5 seconds."
     purge_user_done: "כל ההודעות של {user} נמחקו בהצלחה!"
   misc:
     your_id: "הID שלך הוא: <code>{id}</code>\n"
     chat_id: "הID של הקבוצה הוא: <code>{id}</code>\n"
-    user_id: "{user}'s ID: <code>{id}</code>\n"
+    user_id: "המספר ID של {user} הוא <code>{id}</code>\n"
     conn_chat_id: "Current connected chat ID: <code>{id}</code>"
     help_btn: "לחץ כאן לעזרה!"
-    help_txt: "Click the button below for help!"
+    help_txt: "לחצו על הכפתור מלמטה בשביל עזרה!"
     delmsg_filter_title: 'מחק את ההודעה'
-    send_text: Please send the reply message!
+    send_text: בבקשה תשלח את התגובה!
     replymsg_filter_title: 'השב להודעה'
     send_customised_reason: Send the <i>reason</i> you want to include in action message. "<code>None</code>" for <i>no reason</i> to be given!
     expected_text: Expected a text message!
   promotes:
-    promote_success: "{user} was successfully promoted in {chat_name}!"
+    promote_success: "{user} קודם בהצלחה ב {chat_name}!"
     promote_title: "\nWith custom role <code>{role}</code>!"
     rank_to_loong: "Custom role text cannot be longer than 16 symbols."
     promote_failed: "Promotion failed! Check if I have rights to."
-    demote_success: "{user} was successfully demoted in {chat_name}!"
+    demote_success: "{user} הודח בהצלחה ב{chat_name}!"
     demote_not_admin: "המשתמש הזה לא מנהל."
     demote_failed: "Demotion failed. Maybe I can't demote or the person is promoted by someone else"
     cant_get_user: "I couldn't get the user! If you mind, please reply to his message and try again."
@@ -174,7 +174,7 @@ STRINGS:
     #/help
     help_header: "Hey! My name is <b>AllMight</b>. I am a group management bot, here to help you get around and keep the order in your groups!\nI have lots of handy features, such as flood control, a warning system, a note keeping system, and even predetermined replies on certain keywords."
     click_btn: לחץ כאן
-    btn_group_help: "Click me for help!"
+    btn_group_help: "לחץ כאן לעזרה!"
   disable:
     #/disableable
     disablable: "<b>Disable-able commands:</b>\n"
