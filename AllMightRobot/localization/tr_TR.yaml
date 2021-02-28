@@ -73,7 +73,7 @@ STRINGS:
     #/addfilter
     anon_detected: Being anonymous admin, you cannot add new filters, use connections instead.
     regex_too_slow: "Your regex pattern is matching too slow (more than the half of second), it can't be added!"
-    cancel_btn: "🛑 Cancel"
+    cancel_btn: "🛑 İptal"
     adding_filter: |
       <b>{chat_name}</b> içinde <code>{handler}</code> filtresi ekleme
       Aşağıdaki işlemi seçin:
