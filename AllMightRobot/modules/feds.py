@@ -863,7 +863,7 @@ async def cancel(event):
     await event.message.delete()
 
 
-@decorator.register(cmds='frename')
+@decorator.register(cmds=['frename', "renamefed"])
 @need_args_dec()
 @get_fed_dec
 @is_fed_owner
@@ -1233,7 +1233,7 @@ Well basically there is 2 reasons to use Federations:
 1. You have many chats and want to ban users in all of them with 1 command
 2. You want to subscribe to any of the antispam Federations to have your chat(s) protected.
 
-In both cases AllMight will help you.
+In both cases federations will help you.
 
 <b>Arguments types help:</b>
 <code>()</code>: required argument
@@ -1242,29 +1242,29 @@ In both cases AllMight will help you.
 <code>(? )</code>: additional argument
 
 <b>Only Federation owner:</b>
-- /fnew (name) or /newfed (name): Creates a new Federation
-- /frename (?Fed ID) (new name): Renames your federation
-- /fdel (?Fed ID) or /delfed (?Fed ID): Removes your Federation
-- /fpromote (user) (?Fed ID): Promotes a user to the your Federation
-- /fdemote (user) (?Fed ID): Demotes a user from the your Federation
-- /fsub (Fed ID): Subscibes your Federation over provided
-- /funsub (Fed ID): unsubscibes your Federation from provided
-- /fsetlog (? Fed ID) (? chat/channel id) or /setfedlog (? Fed ID) (? chat/channel id): Set's a log chat/channel for your Federation
-- /funsetlog (?Fed ID) or /unsetfedlog (?Fed ID): Unsets a Federation log chat\channel
-- /fexport (?Fed ID): Exports Federation bans
-- /fimport (?Fed ID) (file): Imports Federation bans
+ • /fnew (name) or /newfed (name): Creates a new Federation
+ • /frename or /renamefed (?Fed ID) (new name): Renames your federation
+ • /fdel (?Fed ID) or /delfed (?Fed ID): Removes your Federation
+ • /fpromote (user) (?Fed ID): Promotes a user to the your Federation
+ • /fdemote (user) (?Fed ID): Demotes a user from the your Federation
+ • /fsub (Fed ID): Subscibes your Federation over provided
+ • /funsub (Fed ID): unsubscibes your Federation from provided
+ • /fsetlog (? Fed ID) (? chat/channel id) or /setfedlog (? Fed ID) (? chat/channel id): Set's a log chat/channel for your Federation
+ • /funsetlog (?Fed ID) or /unsetfedlog (?Fed ID): Unsets a Federation log chat\channel
+ • /fexport (?Fed ID): Exports Federation bans
+ • /fimport (?Fed ID) (file): Imports Federation bans
 
 <b>Only Chat owner:</b>
-- /fjoin (Fed ID) or /joinfed (Fed ID): Joins current chat to provided Federation
-- /fleave or /leavefed: Leaves current chat from the fed
+ • /fjoin (Fed ID) or /joinfed (Fed ID): Joins current chat to provided Federation
+ • /fleave or /leavefed: Leaves current chat from the fed
 
 <b>Avaible for Federation admins and owners:</b>
-- /fchatlist (?Fed ID) or /fchats (?Fed ID): Shows a list of chats in the your Federation list
-- /fban (user) (?Fed ID) (?reason): Bans user in the Fed and Feds which subscribed on this Fed
-- /sfban (user) (?Fed ID) (?reason): As above, but silently - means the messages about fbanning and replied message (if was provided) will be removed
-- /unfban (user) (?Fed ID) (?reason): Unbans a user from a Federation
+ • /fchatlist (?Fed ID) or /fchats (?Fed ID): Shows a list of chats in the your Federation list
+ • /fban (user) (?Fed ID) (?reason): Bans user in the Fed and Feds which subscribed on this Fed
+ • /sfban (user) (?Fed ID) (?reason): As above, but silently - means the messages about fbanning and replied message (if was provided) will be removed
+ • /unfban (user) (?Fed ID) (?reason): Unbans a user from a Federation
 
 <b>Avaible for all users:</b>
-- /fcheck (?user): Check user's federation ban info
-- /finfo (?Fed ID): Info about Federation
+ • /fcheck or /fbanstat (?user): Check user's federation ban info
+ • /finfo or /fedinfo (?Fed ID): Info about Federation
 """

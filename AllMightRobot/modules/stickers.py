@@ -53,5 +53,5 @@ __help__ = """
 Stickers are the best way to show emotion.
 
 <b>Available commands:</b>
-- /getsticker: Give the sticker image and ID.
+ • /getsticker: Give the sticker image and ID.
 """

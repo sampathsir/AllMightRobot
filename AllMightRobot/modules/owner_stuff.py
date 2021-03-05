@@ -59,7 +59,7 @@ async def all_modules_list(message):
     await message.reply(text)
 
 
-@register(cmds='avaiblebtns', is_op=True)
+@register(cmds='availablebuttons', is_op=True)
 async def all_btns_list(message):
     text = "Avaible message inline btns:\n"
     for module in BUTTONS:
@@ -72,7 +72,7 @@ async def get_bot_ip(message):
     await message.reply(requests.get("http://ipinfo.io/ip").text)
 
 
-@register(cmds="term", is_owner=True)
+@register(cmds="shell", is_owner=True)
 async def cmd_term(message):
     msg = await message.reply("Running...")
     command = str(message.text.split(" ", 1)[1])
@@ -109,7 +109,7 @@ async def stop_sbroadcast(message):
     await db.sbroadcast.drop({})
     await message.reply(
         "Smart broadcast stopped."
-        "It was sended to <code>%d</code> chats." % old['recived_chats']
+        "It was sent to <code>%d</code> chats." % old['recived_chats']
     )
 
 

@@ -256,11 +256,11 @@ __help__ = """
 Get information about anime, manga or anime characters.
 
 <b>Available commands:</b>
-- /anime (anime): returns information about the anime.
-- /character (character): returns information about the character.
-- /manga (manga): returns information about the manga.
-- /airing (anime): returns anime airing info.
-- /kaizoku (anime): search an anime on animekaizoku.com
-- /kayo (anime): search an anime on animekayo.com
-- /upcoming: returns a list of new anime in the upcoming seasons.
+ • /anime (anime): returns information about the anime
+ • /character (character): returns information about tte character
+ • /manga (manga): returns information about the manga
+ • /airing (anime): returns anime airing info
+ • /kaizoku (anime): search an anime on animekaizoku.co
+ • /kayo (anime): search an anime on animekayo.com
+ • /upcoming: returns a list of new anime in the upcoming seasons
 """

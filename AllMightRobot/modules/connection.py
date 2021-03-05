@@ -243,14 +243,14 @@ Sometimes you need change something in your chat, like notes, but you don't want
 
 <b>Available commands are:</b>
 <b>Avaible only in PM:</b>
-- /connect: Show last connected chats button for fast connection
-- /connect (chat ID or chat nickname): Connect to chat by argument which you provided
-- /reconnect: Connect to last connected chat before
-- /disconnect: Disconnect from
+ • /connect: Show last connected chats button for fast connection
+ • /connect (chat ID or chat nickname): Connect to chat by argument which you provided
+ • /reconnect: Connect to last connected chat before
+ • /disconnect: Disconnect from
 
 <b>Avaible only in groups:</b>
-- /connect: Direct connect to this group
+ • /connect: Direct connect to this group
 
 <b>Other commands:</b>
-- /allowusersconnect (on/off enable/disable): Enable or disable connection feature for regular users, for admins connections will be works always
+ • /allowusersconnect (on/off enable/disable): Enable or disable connection feature for regular users, for admins connections will be works always
 """

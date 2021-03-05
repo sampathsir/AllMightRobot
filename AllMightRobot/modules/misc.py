@@ -145,7 +145,7 @@ __help__ = """
 An "odds and ends" module for small, simple commands which don't really fit anywhere.
 
 <b>Available commands:</b>
-- /cancel: Disables current state. Can help in cases if AllMight not responing on your message.
-- /id: get the current group id. If used by replying to a message, gets that user's id.
-- /info: get information about a user.
+ • /cancel: Disables current state. Can help in cases if AllMight not responing on your message
+ • /id: get the current group id. If used by replying to a message, gets that user's id
+ • /info: get information about a user
 """

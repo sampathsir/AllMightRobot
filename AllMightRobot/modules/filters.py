@@ -384,9 +384,15 @@ __help__ = """
 Filter module is great for everything! filter in here is used to filter words or sentences in your chat - send notes, warn, ban those!
 
 <b>General (Admins):</b>
-- /addfilter (word/sentence)
+Lists all filters in the group
+
+<b>Available for all users:</b>
+ • /filters or /listfilters
+
+ • /addfilter (word/sentence)
 As in command this is used to add filter. To avoid hassle when setting up the the filter, AllMight will take you through an interactive setup!
 
+Filters support multiple actions!
 <b>As of now, there is 6 actions that you can do:</b>
 - <code>Send a note</code>
 - <code>Warn the user</code>
@@ -395,12 +401,8 @@ As in command this is used to add filter. To avoid hassle when setting up the th
 - <code>tBan the user</code>
 - <code>tMute the user</code>
 
-A filter can support multiple actions !
-
 Ah if you don't understand what this actions are for? Actions says bot what to do when the given <code>word/sentence</code> is triggered.
 
-<b>Available for all users:</b>
-- /filters or /listfilters
-
-You want to know all filter of your chat/ chat you joined? Use this command. It will list all filters along with specified actions !
+ • /rmfilter or /delfilter (word/sentence)
+Removes the filter
 """

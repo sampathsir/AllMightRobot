@@ -663,17 +663,17 @@ Sometimes you need to save some data, like text or pictures. With notes, you can
 Also notes perfectly working in PM with AllMight.
 
 <b>Available commands:</b>
-- /save (name) (data): Saves the note.
-- #(name) or /get (name): Get the note registered to that word.
-- /clear (name): deletes the note.
-- /notes or /saved: Lists all notes.
-- /noteinfo (name): Shows detailed info about the note.
-- /search (search pattern): Search text in notes
-- /clearall: Clears all notes
+ • /save (name) (data): Saves the note
+- #(name) or /get (name): Get the note registered to that word
+ • /clear (name): deletes the note
+ • /notes or /saved: Lists all notes
+ • /noteinfo (name): Shows detailed info about the note
+ • /search (search pattern): Search text in notes
+ • /clearall: Clears all notes
 
 <b>Only in groups:</b>
-- /privatenotes (on/off): Redirect user in PM to see notes
-- /cleannotes (on/off): Will clean old notes messages
+ • /privatenotes (on/off): Redirect user in PM to see notes
+ • /cleannotes (on/off): Will clean old notes messages
 
 <b>Examples:</b>
 An example of how to save a note would be via:
